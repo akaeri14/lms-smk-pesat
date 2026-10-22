@@ -106,6 +106,11 @@ const deleteQuiz = () => {
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Soal</span>
                             <p class="text-base font-extrabold text-slate-800">{{ quiz.questions_count }} Pertanyaan</p>
                         </div>
+                        <div class="border-t border-slate-200/60 pt-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Mode</span>
+                            <p class="text-sm font-extrabold text-slate-800">{{ quiz.quiz_mode === 'assign' ? 'Assign / Tugas' : 'Live Game' }}</p>
+                            <p v-if="quiz.due_at" class="text-xs text-slate-500">Deadline: {{ new Date(quiz.due_at).toLocaleString('id-ID') }}</p>
+                        </div>
                     </div>
                 </div>
 
@@ -124,6 +129,13 @@ const deleteQuiz = () => {
 
                     <!-- Tombol Edit & Hapus Khusus Guru/Admin -->
                     <template v-if="canManage">
+                        <Link
+                            v-if="quiz.quiz_mode !== 'assign'"
+                            :href="route('quizzes.host', quiz.id)"
+                            class="inline-flex items-center gap-1.5 rounded-xl bg-[#FFA800] px-4 py-2.5 text-sm font-bold text-slate-950 shadow-sm transition hover:bg-[#F59E0B]"
+                        >
+                            Buka Host / Lobby
+                        </Link>
                         <Link
                             :href="route('quizzes.edit', quiz.id)"
                             class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#0E3BB0]"

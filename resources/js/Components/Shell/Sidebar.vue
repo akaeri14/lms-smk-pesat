@@ -18,6 +18,7 @@ const navigation = [
 
 const adminNavigation = [
     { label: 'Manajemen User', route: 'admin.users.index', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+    { label: 'Atur Kuis', route: 'admin.quiz-settings.index', icon: 'M9 3h6m-7 4h8m-9 4h10m-8 4h6M5 3h.01M5 7h.01M5 11h.01M5 15h.01M5 19h.01M4 21h16a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1Z' },
     { label: 'API Documentation', route: 'admin.api-docs.index', icon: 'M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5Zm4 3h8M8 12h8M8 16h5' },
 ];
 

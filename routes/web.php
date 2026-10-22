@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\ApiDocsController;
+use App\Http\Controllers\AdminQuizSettingsController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -45,6 +46,15 @@ Route::middleware('auth')->group(function () {
     Route::post('classes/{schoolClass}/quizzes', [QuizController::class, 'store'])->name('classes.quizzes.store');
     Route::resource('quizzes', QuizController::class)->except(['create', 'store']);
     Route::get('quizzes/{quiz}/play', [QuizController::class, 'play'])->name('quizzes.play');
+    Route::get('quizzes/{quiz}/results', [QuizController::class, 'results'])->name('quizzes.results');
+    Route::get('quizzes/{quiz}/host', [QuizController::class, 'host'])->name('quizzes.host');
+    Route::post('quizzes/{quiz}/join', [QuizController::class, 'joinGame'])->name('quizzes.join');
+    Route::get('quizzes/{quiz}/game-state', [QuizController::class, 'gameState'])->name('quizzes.game-state');
+    Route::post('quizzes/{quiz}/start', [QuizController::class, 'startGame'])->name('quizzes.start');
+    Route::post('quizzes/{quiz}/pause', [QuizController::class, 'pauseGame'])->name('quizzes.pause');
+    Route::post('quizzes/{quiz}/end', [QuizController::class, 'endGame'])->name('quizzes.end');
+    Route::post('quizzes/{quiz}/answers', [QuizController::class, 'submitAnswer'])->name('quizzes.answers.store');
+    Route::get('quizzes/{quiz}/live-leaderboard', [QuizController::class, 'liveLeaderboard'])->name('quizzes.live-leaderboard');
     Route::post('quizzes/{quiz}/attempts', [QuizController::class, 'attempt'])->name('quizzes.attempts.store');
 
     // Admin: Manajemen User
@@ -53,6 +63,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
     Route::post('/admin/users/sync-profiling', [UserController::class, 'syncProfiling'])->name('admin.users.sync-profiling');
+    Route::get('/admin/quiz-settings', [AdminQuizSettingsController::class, 'index'])->middleware('role:admin')->name('admin.quiz-settings.index');
+    Route::post('/admin/quiz-settings/upload', [AdminQuizSettingsController::class, 'store'])->middleware('role:admin')->name('admin.quiz-settings.upload');
+    Route::post('/admin/quiz-settings/tracks', [AdminQuizSettingsController::class, 'store'])->middleware('role:admin')->name('admin.quiz-settings.tracks.store');
+    Route::patch('/admin/quiz-settings/tracks/{track}', [AdminQuizSettingsController::class, 'update'])->middleware('role:admin')->name('admin.quiz-settings.tracks.update');
+    Route::delete('/admin/quiz-settings/tracks/{track}', [AdminQuizSettingsController::class, 'destroy'])->middleware('role:admin')->name('admin.quiz-settings.tracks.destroy');
 
     // Admin & developer integration documentation and token management.
     Route::get('/admin/api-docs', [ApiDocsController::class, 'index'])->middleware('role:admin')->name('admin.api-docs.index');

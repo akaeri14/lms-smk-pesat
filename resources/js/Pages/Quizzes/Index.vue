@@ -124,6 +124,13 @@ const deleteQuiz = (quiz) => {
                             <span class="text-xs font-bold text-slate-600">{{ quiz.attempts_count ?? 0 }} Siswa Selesai</span>
                             <div class="flex items-center gap-2">
                                 <Link
+                                    v-if="quiz.quiz_mode !== 'assign'"
+                                    :href="route('quizzes.host', quiz.id)"
+                                    class="rounded-lg bg-[#FFA800] px-2.5 py-1.5 text-xs font-bold text-slate-950 transition hover:bg-[#F59E0B]"
+                                >
+                                    Host
+                                </Link>
+                                <Link
                                     :href="route('quizzes.edit', quiz.id)"
                                     class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50 hover:text-[#0E3BB0]"
                                 >

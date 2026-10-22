@@ -372,6 +372,13 @@ const getStudentStatusBadge = (assignment) => {
                                     {{ quiz.attempts_count ?? 0 }} Siswa Telah Mengerjakan
                                 </span>
                                 <Link
+                                    v-if="quiz.quiz_mode !== 'assign'"
+                                    :href="route('quizzes.host', quiz.id)"
+                                    class="inline-flex items-center gap-1 rounded-lg bg-[#FFA800] px-2.5 py-1.5 text-xs font-bold text-slate-950 hover:bg-[#F59E0B]"
+                                >
+                                    Host
+                                </Link>
+                                <Link
                                     :href="route('quizzes.show', quiz.id)"
                                     class="inline-flex items-center gap-1 text-xs font-bold text-[#0E3BB0] hover:text-[#0B2E8A]"
                                 >

@@ -20,10 +20,20 @@ const form = useForm({
     title: '',
     description: '',
     duration_minutes: 15,
+    max_attempts: null,
+    quiz_mode: 'live',
+    due_at: '',
+    randomize_options: true,
+    bgm: null,
+    time_per_question: 30,
+    enable_fifty_fifty: true,
+    enable_freeze_time: true,
     questions: [
         {
             question_text: '',
+            question_type: 'multiple_choice_single',
             points: 10,
+            time_limit_seconds: null,
             options: [
                 { option_text: '', is_correct: true },
                 { option_text: '', is_correct: false },
@@ -37,7 +47,9 @@ const form = useForm({
 const addQuestion = () => {
     form.questions.push({
         question_text: '',
+        question_type: 'multiple_choice_single',
         points: 10,
+        time_limit_seconds: null,
         options: [
             { option_text: '', is_correct: true },
             { option_text: '', is_correct: false },
@@ -54,6 +66,10 @@ const removeQuestion = (qIndex) => {
 };
 
 const setCorrectOption = (qIndex, oIndex) => {
+    if (form.questions[qIndex].question_type === 'multiple_choice_multiple') {
+        form.questions[qIndex].options[oIndex].is_correct = !form.questions[qIndex].options[oIndex].is_correct;
+        return;
+    }
     form.questions[qIndex].options.forEach((opt, idx) => {
         opt.is_correct = idx === oIndex;
     });
@@ -89,7 +105,7 @@ const optionColorThemes = [
 ];
 
 const submit = () => {
-    form.post(route('quizzes.store'));
+    form.post(route('quizzes.store'), { forceFormData: true });
 };
 </script>
 
@@ -190,6 +206,57 @@ const submit = () => {
                         </div>
                         <InputError :message="form.errors.duration_minutes" class="mt-1" />
                     </div>
+
+                    <div class="w-full sm:w-1/2">
+                        <label class="block text-sm font-bold text-slate-700">Batas Percobaan Siswa</label>
+                        <select v-model="form.max_attempts" class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]">
+                            <option :value="null">Tanpa batas percobaan</option>
+                            <option :value="1">1 kali</option>
+                            <option :value="2">2 kali</option>
+                            <option :value="3">3 kali</option>
+                            <option :value="5">5 kali</option>
+                            <option :value="10">10 kali</option>
+                        </select>
+                        <p class="mt-1 text-xs text-slate-400">Jumlah ini dihitung per siswa.</p>
+                        <InputError :message="form.errors.max_attempts" class="mt-1" />
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700">Mode Kuis</label>
+                            <select v-model="form.quiz_mode" class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]">
+                                <option value="live">Mulai Live Game</option>
+                                <option value="assign">Assign / Berikan Tugas</option>
+                            </select>
+                            <p class="mt-1 text-xs text-slate-400">Live dipandu host; Assign dapat dikerjakan mandiri.</p>
+                        </div>
+                        <div v-if="form.quiz_mode === 'assign'">
+                            <label class="block text-sm font-bold text-slate-700">Tenggat Waktu <span class="text-red-500">*</span></label>
+                            <input v-model="form.due_at" type="datetime-local" class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]" :required="form.quiz_mode === 'assign'" />
+                            <InputError :message="form.errors.due_at" class="mt-1" />
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700">Waktu per Soal</label>
+                            <select v-model="form.time_per_question" class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]">
+                                <option :value="15">15 detik</option>
+                                <option :value="30">30 detik</option>
+                                <option :value="45">45 detik</option>
+                                <option :value="60">60 detik</option>
+                            </select>
+                            <InputError :message="form.errors.time_per_question" class="mt-1" />
+                        </div>
+                        <div class="flex flex-col justify-end gap-2 pb-1 text-sm text-slate-600">
+                            <label class="inline-flex items-center gap-2"><input v-model="form.enable_fifty_fifty" type="checkbox" class="rounded border-slate-300 text-[#0E3BB0] focus:ring-[#0E3BB0]" /> Aktifkan bantuan 50:50</label>
+                            <label class="inline-flex items-center gap-2"><input v-model="form.enable_freeze_time" type="checkbox" class="rounded border-slate-300 text-[#0E3BB0] focus:ring-[#0E3BB0]" /> Aktifkan Freeze Time 10 detik</label>
+                        </div>
+                    </div>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <label class="inline-flex items-center gap-2 text-sm font-semibold text-slate-600"><input v-model="form.randomize_options" type="checkbox" class="rounded border-slate-300 text-[#0E3BB0] focus:ring-[#0E3BB0]" /> Acak pilihan untuk siswa</label>
+                        <div><label class="block text-sm font-bold text-slate-700">Background Music (MP3)</label><input type="file" accept=".mp3,audio/mpeg" class="mt-1.5 block w-full text-xs text-slate-500" @change="form.bgm = $event.target.files[0] || null" /><InputError :message="form.errors.bgm" class="mt-1" /></div>
+                    </div>
                 </div>
             </div>
 
@@ -237,6 +304,13 @@ const submit = () => {
                                     class="w-16 rounded-lg border-slate-200 py-1 text-center text-xs font-bold focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                                 />
                             </div>
+                            <select v-model="question.time_limit_seconds" class="w-32 rounded-lg border-slate-200 py-1 text-xs focus:border-[#0E3BB0] focus:ring-[#0E3BB0]">
+                                <option :value="null">Default kuis</option>
+                                <option :value="15">15 detik</option>
+                                <option :value="30">30 detik</option>
+                                <option :value="45">45 detik</option>
+                                <option :value="60">60 detik</option>
+                            </select>
 
                             <button
                                 v-if="form.questions.length > 1"
@@ -263,6 +337,8 @@ const submit = () => {
                             required
                         ></textarea>
                     </div>
+
+                    <div class="mt-4"><label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Tipe Soal</label><select v-model="question.question_type" class="mt-1.5 rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"><option value="multiple_choice_single">Pilihan Ganda (satu jawaban)</option><option value="multiple_choice_multiple">Pilihan Ganda Kompleks (lebih dari satu)</option></select></div>
 
                     <!-- Opsi Jawaban Pilihan Ganda -->
                     <div class="mt-5 space-y-3">

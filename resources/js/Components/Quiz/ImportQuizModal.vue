@@ -115,7 +115,7 @@ const submitImport = () => {
                     <div>
                         <span class="text-xs font-bold text-slate-800">Format Template Spreadsheet</span>
                         <p class="text-[11px] text-slate-600 mt-0.5">
-                            Gunakan format kolom baku: Pertanyaan, Opsi A–D, Kunci Jawaban (A/B/C/D), Durasi, Poin.
+                            Gunakan kolom Pertanyaan, Tipe Soal, Opsi A–D, Jawaban Benar, Durasi, dan Poin. Jawaban kompleks dapat ditulis A,C.
                         </p>
                     </div>
                     <a
