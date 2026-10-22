@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 
 const props = defineProps({
@@ -53,6 +53,14 @@ const getStudentStatusBadge = (assignment) => {
         class: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
         dotClass: 'bg-emerald-500',
     };
+};
+
+const deleteAssignment = (assignment) => {
+    if (!window.confirm(`Hapus tugas "${assignment.title}"? Data pengumpulan siswa juga akan ikut terhapus.`)) return;
+
+    router.delete(route('assignments.destroy', assignment.id), {
+        preserveScroll: true,
+    });
 };
 </script>
 
@@ -123,6 +131,23 @@ const getStudentStatusBadge = (assignment) => {
                                 {{ getStudentStatusBadge(assignment).label }}
                             </span>
                         </div>
+
+                        <template v-if="user.role === 'guru' || user.role === 'admin'">
+                            <Link
+                                :href="route('assignments.edit', assignment.id)"
+                                @click.stop
+                                class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50 hover:text-[#FF6B35]"
+                            >
+                                Edit
+                            </Link>
+                            <button
+                                type="button"
+                                @click.stop.prevent="deleteAssignment(assignment)"
+                                class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100"
+                            >
+                                Hapus
+                            </button>
+                        </template>
 
                         <span class="hidden text-slate-300 group-hover:text-[#FF6B35] transition sm:inline">
                             →

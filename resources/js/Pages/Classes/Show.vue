@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import ImportQuizModal from '@/Components/Quiz/ImportQuizModal.vue';
 
 const props = defineProps({
     schoolClass: {
@@ -10,20 +11,25 @@ const props = defineProps({
     },
     canManage: Boolean,
     canCreateAssignment: Boolean,
+    canCreateQuiz: Boolean,
 });
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
+
+const showImportModal = ref(false);
 
 const activeTab = ref('overview');
 const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'materials', label: 'Materi' },
     { id: 'assignments', label: 'Tugas' },
+    { id: 'quizzes', label: 'Game Kuis 🎮' },
     { id: 'members', label: 'Anggota' },
 ];
 
 const upcomingAssignments = computed(() => props.schoolClass.assignments ?? []);
+const classQuizzes = computed(() => props.schoolClass.quizzes ?? []);
 const formatDate = (value) => {
     if (!value) return '-';
     return new Intl.DateTimeFormat('id-ID', {
@@ -204,6 +210,98 @@ const getStudentStatusBadge = (assignment) => {
 
                 <div v-else class="rounded-xl border border-slate-100 bg-white p-10 text-center text-sm text-slate-500 shadow-sm">
                     Belum ada tugas untuk kelas ini.
+                </div>
+            </div>
+
+            <!-- Tab: Game Kuis Interaktif -->
+            <div v-if="activeTab === 'quizzes'" class="mt-6">
+                <div class="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                    <div>
+                        <h4 class="text-lg font-bold text-slate-800">Game Kuis Interaktif Kelas 🎮</h4>
+                        <p class="text-xs text-slate-500">Uji pengetahuan dengan gameplay seru berhadiah skor dan leaderboard real-time.</p>
+                    </div>
+                    <Link
+                        v-if="canCreateQuiz"
+                        :href="route('classes.quizzes.create', schoolClass.id)"
+                        class="inline-flex items-center gap-2 rounded-lg bg-[#FF6B35] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#E95521]"
+                    >
+                        <span>+ Buat Kuis Baru</span>
+                    </Link>
+                </div>
+
+                <div v-if="classQuizzes.length" class="grid gap-4 sm:grid-cols-2">
+                    <div
+                        v-for="quiz in classQuizzes"
+                        :key="quiz.id"
+                        class="flex flex-col justify-between rounded-xl border border-slate-100 bg-white p-6 shadow-sm transition hover:border-orange-200 hover:shadow-md"
+                    >
+                        <div>
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-bold text-[#E95521]">
+                                    ⏱ {{ quiz.duration_minutes }} Menit
+                                </span>
+                                <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
+                                    {{ quiz.questions_count ?? 0 }} Soal
+                                </span>
+                            </div>
+
+                            <h5 class="mt-3 text-lg font-extrabold text-slate-800">
+                                {{ quiz.title }}
+                            </h5>
+                            <p class="mt-1 line-clamp-2 text-xs text-slate-500">
+                                {{ quiz.description || 'Kuis pilihan ganda interaktif untuk melatih pemahaman materi.' }}
+                            </p>
+                        </div>
+
+                        <div class="mt-5 border-t border-slate-100 pt-4">
+                            <!-- Sisi Guru: Statistik Attempt & Leaderboard Link -->
+                            <div v-if="user.role === 'guru' || user.role === 'admin'" class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-500">
+                                    {{ quiz.attempts_count ?? 0 }} Siswa Telah Mengerjakan
+                                </span>
+                                <Link
+                                    :href="route('quizzes.show', quiz.id)"
+                                    class="inline-flex items-center gap-1 text-xs font-bold text-[#FF6B35] hover:text-[#E95521]"
+                                >
+                                    <span>Leaderboard & Detail</span>
+                                    <span>→</span>
+                                </Link>
+                            </div>
+
+                            <!-- Sisi Siswa: Status Skor & Tombol Play -->
+                            <div v-else-if="user.role === 'siswa'" class="flex items-center justify-between">
+                                <div>
+                                    <span
+                                        v-if="quiz.attempts?.[0]"
+                                        class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800"
+                                    >
+                                        ✓ Skor: {{ quiz.attempts[0].score }}/100
+                                    </span>
+                                    <span
+                                        v-else
+                                        class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600"
+                                    >
+                                        Belum Dikerjakan
+                                    </span>
+                                </div>
+
+                                <Link
+                                    :href="route('quizzes.play', quiz.id)"
+                                    class="inline-flex items-center gap-1.5 rounded-lg bg-[#FF6B35] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#E95521]"
+                                >
+                                    <span>🎮 {{ quiz.attempts?.[0] ? 'Main Lagi' : 'Mulai Main' }}</span>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-else class="rounded-xl border border-slate-100 bg-white p-12 text-center text-sm text-slate-500 shadow-sm">
+                    <span class="text-4xl">🎮</span>
+                    <h5 class="mt-3 font-bold text-slate-800">Belum Ada Kuis di Kelas Ini</h5>
+                    <p class="mt-1 text-xs text-slate-500">
+                        {{ canCreateQuiz ? 'Klik tombol "+ Buat Kuis Baru" di atas untuk menambahkan kuis pertama Anda.' : 'Pengajar belum membuat game kuis untuk kelas ini.' }}
+                    </p>
                 </div>
             </div>
 

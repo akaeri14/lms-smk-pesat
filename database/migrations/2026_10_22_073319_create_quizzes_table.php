@@ -15,8 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('class_id')->constrained('classes')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('title');
-            $table->unsignedInteger('duration_minutes');
-            $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
+            $table->text('description')->nullable();
+            $table->unsignedInteger('duration_minutes')->default(15);
+            $table->boolean('is_published')->default(true);
+            $table->enum('status', ['draft', 'published', 'archived'])->default('published');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

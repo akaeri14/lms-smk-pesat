@@ -96,9 +96,11 @@
 - `graded_at` (datetime, nullable)
 - `timestamps`
 
-### 4.7 `quizzes` & `quiz_questions`
-- `quizzes`: `id`, `class_id` (FK), `title`, `duration_minutes`, `status`, `timestamps`
-- `quiz_questions`: `id`, `quiz_id` (FK), `question_text`, `type` (`'multiple_choice'`, `'essay'`), `options` (json), `correct_answer` (string), `points` (integer), `timestamps`
+### 4.7 `quizzes`, `quiz_questions`, `quiz_options` & `quiz_attempts` (Game Quiz Interaktif)
+- `quizzes`: `id` (PK), `class_id` (FK -> `classes.id`), `title` (string), `description` (text, nullable), `duration_minutes` (integer, default: 15), `is_published` (boolean, default: true), `status` (enum: `'draft'`, `'published'`, `'archived'`, default: `'published'`), `created_by` (FK -> `users.id`, nullable), `timestamps`
+- `quiz_questions`: `id` (PK), `quiz_id` (FK -> `quizzes.id`), `question_text` (text), `points` (integer, default: 10), `timestamps`
+- `quiz_options`: `id` (PK), `quiz_question_id` (FK -> `quiz_questions.id`), `option_text` (text), `is_correct` (boolean, default: false), `timestamps`
+- `quiz_attempts`: `id` (PK), `quiz_id` (FK -> `quizzes.id`), `user_id` (FK -> `users.id`), `score` (integer, default: 0), `total_correct` (integer, default: 0), `total_questions` (integer, default: 0), `answers` (json, nullable), `completed_at` (datetime, nullable), `timestamps`
 
 ### 4.8 `attendances`
 - `id` (PK), `class_id` (FK), `student_id` (FK), `date` (date), `status` (`'present'`, `'absent'`, `'sick'`, `'permission'`), `timestamps`
@@ -116,6 +118,12 @@
 ## 6. Development Phasing Roadmap
 - **Phase 1 (MVP):** Database Migrations, Role Middleware, Seeder (Admin, 2 Teachers, 5 Students), Shell Layout (`Sidebar.vue`, `Header.vue`, `AuthenticatedLayout.vue`), Dashboard page.
 - **Phase 2:** Class Management (Create class, Join via code, Member directory) & Material / Assignment management.
-- **Phase 3:** Assignment Submissions, Grading System & Automatic Quizzes.
+- **Phase 3: Game Quiz Interaktif (ala Quizizz/Wayground) & Assignment Grading System:**
+  - **Fitur Guru:**
+    - Pembuat Kuis & Bank Soal Pilihan Ganda (teks soal, durasi pengerjaan, opsi jawaban, dan kunci jawaban).
+    - Pengaturan Kuis (Mode Latihan/PR asinkron & Mode Live).
+    - Rekap Hasil Kuis & Leaderboard Nilai Siswa.
+  - **Fitur Siswa:**
+    - Antarmuka pengerjaan kuis interaktif dengan timer countdown, efek indikator visual benar/salah, skor instan, dan papan peringkat (leaderboard).
 - **Phase 4:** Attendance Recording, Academic Analytics & Excel Export.
 - **Phase 5:** SSO Integration (`profile.smkpesat.id`) & Virtual Class integration.

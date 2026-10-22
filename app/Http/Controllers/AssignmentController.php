@@ -92,14 +92,28 @@ class AssignmentController extends Controller
 
         return Inertia::render('Assignments/Show', [
             'assignment' => $assignment,
-            'canManage' => $user->can('update', $assignment),
+            'canManage'  => $user->can('update', $assignment),
             'submission' => $submission,
             'submissions' => $submissions,
         ]);
     }
 
+    public function edit(Assignment $assignment): Response
+    {
+        $this->authorize('update', $assignment);
+
+        $assignment->load('schoolClass:id,name,subject,teacher_id');
+
+        return Inertia::render('Assignments/Edit', [
+            'assignment'  => $assignment,
+            'schoolClass' => $assignment->schoolClass->only('id', 'name', 'subject'),
+        ]);
+    }
+
     public function update(UpdateAssignmentRequest $request, Assignment $assignment): RedirectResponse
     {
+        $this->authorize('update', $assignment);
+
         $data = $request->safe()->except('attachment');
 
         if ($request->hasFile('attachment')) {

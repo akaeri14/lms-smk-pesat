@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import InputError from '@/Components/InputError.vue';
 
@@ -183,6 +183,22 @@ const getFileExtension = (path) => {
 const isPdf = computed(() => getFileExtension(previewFilePath.value) === 'pdf');
 const isImage = computed(() => ['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].includes(getFileExtension(previewFilePath.value)));
 const previewFileName = computed(() => previewFilePath.value.split('/').pop() || 'berkas');
+
+// ==========================================
+// Hapus Tugas (Guru / Admin)
+// ==========================================
+const showDeleteConfirm = ref(false);
+const isDeleting = ref(false);
+
+const deleteAssignment = () => {
+    isDeleting.value = true;
+    router.delete(route('assignments.destroy', props.assignment.id), {
+        onFinish: () => {
+            isDeleting.value = false;
+            showDeleteConfirm.value = false;
+        },
+    });
+};
 </script>
 
 <template>
@@ -290,6 +306,29 @@ const previewFileName = computed(() => previewFilePath.value.split('/').pop() ||
                             <span>Unduh</span>
                         </a>
                     </div>
+                </div>
+
+                <!-- Aksi pengelolaan tugas untuk Guru/Admin -->
+                <div v-if="canManage" class="mt-7 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-5">
+                    <Link
+                        :href="route('assignments.edit', assignment.id)"
+                        class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#FF6B35]"
+                    >
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <span>Edit Tugas</span>
+                    </Link>
+                    <button
+                        type="button"
+                        @click="showDeleteConfirm = true"
+                        class="inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 shadow-sm transition hover:bg-red-100"
+                    >
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span>Hapus Tugas</span>
+                    </button>
                 </div>
             </div>
 

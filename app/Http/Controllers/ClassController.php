@@ -62,12 +62,20 @@ class ClassController extends Controller
                     'submissions' => fn ($subQuery) => $subQuery->where('student_id', $user->id),
                 ]))
                 ->latest('deadline'),
+            'quizzes' => fn ($query) => $query
+                ->with('creator:id,name')
+                ->withCount(['questions', 'attempts'])
+                ->when($user->role === 'siswa', fn ($q) => $q->with([
+                    'attempts' => fn ($aq) => $aq->where('user_id', $user->id)->latest('completed_at'),
+                ]))
+                ->latest(),
         ])->loadCount('students');
 
         return Inertia::render('Classes/Show', [
             'schoolClass' => $schoolClass,
             'canManage' => $request->user()->can('update', $schoolClass),
             'canCreateAssignment' => $request->user()->can('create', [Assignment::class, $schoolClass]),
+            'canCreateQuiz' => $user->role === 'admin' || ($user->role === 'guru' && $schoolClass->teacher_id === $user->id),
         ]);
     }
 

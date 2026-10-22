@@ -15,10 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('quiz_id')->constrained('quizzes')->cascadeOnUpdate()->cascadeOnDelete();
             $table->text('question_text');
-            $table->enum('type', ['multiple_choice', 'essay']);
-            $table->json('options')->nullable();
-            $table->string('correct_answer')->nullable();
-            $table->unsignedInteger('points');
+            $table->unsignedInteger('points')->default(10);
             $table->timestamps();
         });
     }
