@@ -12,6 +12,12 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                xpro: {
+                    primary: '#0E3BB0',
+                    accent: '#FFA800',
+                },
+            },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },

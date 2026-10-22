@@ -18,6 +18,7 @@ const navigation = [
 
 const adminNavigation = [
     { label: 'Manajemen User', route: 'admin.users.index', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+    { label: 'API Documentation', route: 'admin.api-docs.index', icon: 'M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5Zm4 3h8M8 12h8M8 16h5' },
 ];
 
 const isActive = (item) => item.route && route().current(item.route);
@@ -28,8 +29,8 @@ const isActive = (item) => item.route && route().current(item.route);
     <aside :class="open ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-slate-200 bg-white transition-transform duration-200 lg:static lg:translate-x-0">
         <div class="flex h-20 items-center justify-between border-b border-slate-100 px-6">
             <Link :href="route('dashboard')" class="flex items-center gap-3" @click="emit('close')">
-                <span class="grid h-10 w-10 place-items-center rounded-xl bg-[#FF6B35] text-lg font-black text-white">P</span>
-                <span><span class="block text-sm font-extrabold tracking-tight text-slate-800">SMK PESAT</span><span class="block text-[10px] font-bold uppercase tracking-[0.16em] text-[#FF6B35]">Learning Space</span></span>
+                <span class="grid h-10 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#0E3BB0] px-1"><img src="/images/logo-xpro.png" alt="XPRO" class="max-h-8 max-w-full object-contain" @error="$event.currentTarget.classList.add('hidden'); $event.currentTarget.nextElementSibling.classList.remove('hidden')" /><span class="hidden text-sm font-black tracking-tight text-white">XPRO</span></span>
+                <span><span class="block text-sm font-extrabold tracking-tight text-slate-800">SMK PESAT</span><span class="block text-[10px] font-bold uppercase tracking-[0.16em] text-[#0E3BB0]">Learning Space</span></span>
             </Link>
             <button class="rounded-lg p-2 text-slate-400 hover:bg-slate-100 lg:hidden" type="button" aria-label="Tutup menu" @click="emit('close')"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
         </div>
@@ -44,7 +45,7 @@ const isActive = (item) => item.route && route().current(item.route);
                     :key="item.label"
                     :href="item.route ? route(item.route) : undefined"
                     :class="[
-                        isActive(item) ? 'border-[#FF6B35] bg-orange-50 text-[#E95521]' : 'border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-800',
+                        isActive(item) ? 'border-[#0E3BB0] bg-blue-50 text-[#0B2E8A]' : 'border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-800',
                         !item.route ? 'cursor-not-allowed opacity-50' : ''
                     ]"
                     class="flex items-center gap-3 border-l-2 px-3 py-3 text-sm font-semibold transition"
@@ -56,13 +57,13 @@ const isActive = (item) => item.route && route().current(item.route);
 
             <!-- Menu Admin -->
             <template v-if="user?.role === 'admin'">
-                <p class="mb-3 mt-6 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-red-400">Administrasi</p>
+                <p class="mb-3 mt-6 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#0E3BB0]">Administrasi</p>
                 <div class="space-y-1">
                     <Link
                         v-for="item in adminNavigation"
                         :key="item.label"
                         :href="route(item.route)"
-                        :class="isActive(item) ? 'border-red-500 bg-red-50 text-red-700' : 'border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-800'"
+                        :class="isActive(item) ? 'border-[#0E3BB0] bg-blue-50 text-[#0B2E8A]' : 'border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-800'"
                         class="flex items-center gap-3 border-l-2 px-3 py-3 text-sm font-semibold transition"
                         @click="emit('close')"
                     >

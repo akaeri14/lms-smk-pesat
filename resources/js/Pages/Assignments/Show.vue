@@ -209,7 +209,7 @@ const deleteAssignment = () => {
             <div class="flex items-center gap-3">
                 <Link
                     :href="route('classes.show', assignment.class_id)"
-                    class="text-sm font-medium text-slate-400 transition hover:text-[#FF6B35]"
+                    class="text-sm font-medium text-slate-400 transition hover:text-[#0E3BB0]"
                 >
                     {{ assignment.school_class?.name || 'Kelas' }}
                 </Link>
@@ -238,7 +238,7 @@ const deleteAssignment = () => {
             <div class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
                 <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
                     <div class="space-y-3">
-                        <span class="inline-block rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-[#E95521]">
+                        <span class="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-[#0B2E8A]">
                             {{ assignment.school_class?.subject || 'Mata Pelajaran' }}
                         </span>
                         <h1 class="text-2xl font-extrabold text-slate-900 sm:text-3xl">
@@ -253,7 +253,7 @@ const deleteAssignment = () => {
                     <div class="w-full shrink-0 rounded-xl bg-slate-50 p-5 sm:w-72">
                         <div class="mb-3">
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Batas Pengumpulan</span>
-                            <p class="mt-1 text-sm font-bold" :class="isPastDeadline ? 'text-red-500' : 'text-[#E95521]'">
+                            <p class="mt-1 text-sm font-bold" :class="isPastDeadline ? 'text-red-500' : 'text-[#0B2E8A]'">
                                 {{ deadlineFormatted }}
                             </p>
                             <span
@@ -287,7 +287,7 @@ const deleteAssignment = () => {
                         <a
                             :href="`/storage/${assignment.file_path}`"
                             target="_blank"
-                            class="inline-flex items-center gap-2 rounded-xl border border-orange-100 bg-orange-50/70 px-4 py-2.5 text-sm font-semibold text-[#E95521] transition hover:bg-orange-100"
+                            class="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/70 px-4 py-2.5 text-sm font-semibold text-[#0B2E8A] transition hover:bg-blue-100"
                         >
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -312,7 +312,7 @@ const deleteAssignment = () => {
                 <div v-if="canManage" class="mt-7 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-5">
                     <Link
                         :href="route('assignments.edit', assignment.id)"
-                        class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#FF6B35]"
+                        class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#0E3BB0]"
                     >
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -359,7 +359,7 @@ const deleteAssignment = () => {
                             v-else-if="submission.status === 'late'"
                             class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800"
                         >
-                            ⚠ Dikumpulkan (Terlambat)
+                            Dikumpulkan (Terlambat)
                         </span>
                         <span
                             v-else
@@ -413,9 +413,9 @@ const deleteAssignment = () => {
                                 <button
                                     type="button"
                                     @click="openSelfPreview"
-                                    class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#FF6B35]"
+                                    class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#0E3BB0]"
                                 >
-                                    <svg class="h-4 w-4 text-[#FF6B35]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg class="h-4 w-4 text-[#0E3BB0]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
@@ -462,7 +462,7 @@ const deleteAssignment = () => {
                         <button
                             type="button"
                             @click="showReSubmitForm = !showReSubmitForm"
-                            class="text-xs font-bold text-[#FF6B35] underline hover:text-[#E95521]"
+                            class="text-xs font-bold text-[#0E3BB0] underline hover:text-[#0B2E8A]"
                         >
                             {{ showReSubmitForm ? 'Tutup form perbaruan tugas ▲' : 'Perbarui atau kirim ulang tugas ▼' }}
                         </button>
@@ -488,7 +488,7 @@ const deleteAssignment = () => {
                             type="file"
                             accept=".pdf,.doc,.docx,.zip"
                             @change="onFileChange"
-                            class="mt-2 block w-full rounded-xl border border-slate-300 text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-orange-50 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-[#FF6B35] transition hover:file:bg-orange-100 focus:outline-none"
+                            class="mt-2 block w-full rounded-xl border border-slate-300 text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-[#0E3BB0] transition hover:file:bg-blue-100 focus:outline-none"
                             required
                         />
                         <p class="mt-1 text-xs text-slate-400">
@@ -506,7 +506,7 @@ const deleteAssignment = () => {
                         <textarea
                             v-model="studentForm.notes"
                             rows="3"
-                            class="mt-2 block w-full rounded-xl border-slate-300 text-sm text-slate-800 placeholder-slate-400 focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-2 block w-full rounded-xl border-slate-300 text-sm text-slate-800 placeholder-slate-400 focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                             placeholder="Tuliskan keterangan tambahan atau catatan untuk pengajar..."
                         ></textarea>
                         <InputError :message="studentForm.errors.notes || studentForm.errors.submission_text" class="mt-1.5" />
@@ -517,7 +517,7 @@ const deleteAssignment = () => {
                         <button
                             type="submit"
                             :disabled="studentForm.processing"
-                            class="inline-flex items-center gap-2 rounded-xl bg-[#FF6B35] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#E95521] disabled:opacity-50"
+                            class="inline-flex items-center gap-2 rounded-xl bg-[#0E3BB0] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#0B2E8A] disabled:opacity-50"
                         >
                             <svg
                                 v-if="studentForm.processing"
@@ -625,10 +625,10 @@ const deleteAssignment = () => {
                                     v-if="item.file_path"
                                     type="button"
                                     @click="openPreview(item)"
-                                    class="inline-flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50/80 px-3 py-1.5 text-xs font-bold text-[#E95521] transition hover:bg-orange-100"
+                                    class="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50/80 px-3 py-1.5 text-xs font-bold text-[#0B2E8A] transition hover:bg-blue-100"
                                     title="Lihat file di browser tanpa paksa unduh"
                                 >
-                                    <svg class="h-3.5 w-3.5 text-[#FF6B35]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg class="h-3.5 w-3.5 text-[#0E3BB0]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
@@ -653,7 +653,7 @@ const deleteAssignment = () => {
                                 <button
                                     type="button"
                                     @click="openGradingForm(item)"
-                                    class="inline-flex items-center gap-1.5 rounded-lg border border-[#FF6B35] bg-[#FF6B35] px-3 py-1.5 text-xs font-bold text-white transition hover:bg-[#E95521]"
+                                    class="inline-flex items-center gap-1.5 rounded-lg border border-[#0E3BB0] bg-[#0E3BB0] px-3 py-1.5 text-xs font-bold text-white transition hover:bg-[#0B2E8A]"
                                 >
                                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -666,7 +666,7 @@ const deleteAssignment = () => {
                         <!-- Panel Form Penilaian Guru (Expandable Inline) -->
                         <div
                             v-if="gradingSubmissionId === item.id"
-                            class="mt-4 rounded-xl border border-orange-200 bg-orange-50/40 p-5 transition"
+                            class="mt-4 rounded-xl border border-blue-200 bg-blue-50/40 p-5 transition"
                         >
                             <h4 class="text-sm font-bold text-slate-800">
                                 Form Penilaian: {{ item.student?.name }}
@@ -684,7 +684,7 @@ const deleteAssignment = () => {
                                             min="0"
                                             :max="assignment.max_score"
                                             placeholder="Contoh: 85"
-                                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                                             required
                                         />
                                         <InputError :message="gradeForm.errors.score" class="mt-1" />
@@ -698,7 +698,7 @@ const deleteAssignment = () => {
                                             v-model="gradeForm.teacher_feedback"
                                             rows="2"
                                             placeholder="Tuliskan catatan evaluasi atau saran perbaikan untuk siswa..."
-                                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                                         ></textarea>
                                         <InputError :message="gradeForm.errors.teacher_feedback" class="mt-1" />
                                     </div>
@@ -708,7 +708,7 @@ const deleteAssignment = () => {
                                     <button
                                         type="submit"
                                         :disabled="gradeForm.processing"
-                                        class="inline-flex items-center gap-1.5 rounded-lg bg-[#FF6B35] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#E95521] disabled:opacity-50"
+                                        class="inline-flex items-center gap-1.5 rounded-lg bg-[#0E3BB0] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#0B2E8A] disabled:opacity-50"
                                     >
                                         <svg
                                             v-if="gradeForm.processing"
@@ -759,7 +759,7 @@ const deleteAssignment = () => {
                 <!-- Modal Header -->
                 <div class="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-6 py-4">
                     <div class="flex items-center gap-3 truncate">
-                        <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-orange-100 text-[#E95521]">
+                        <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-blue-100 text-[#0B2E8A]">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
@@ -826,7 +826,7 @@ const deleteAssignment = () => {
 
                     <!-- Dokumen Format Lain (Word .docx / .doc / .zip) -->
                     <div v-else class="flex h-[55vh] flex-col items-center justify-center p-8 text-center">
-                        <div class="grid h-16 w-16 place-items-center rounded-2xl bg-orange-100 text-[#E95521]">
+                        <div class="grid h-16 w-16 place-items-center rounded-2xl bg-blue-100 text-[#0B2E8A]">
                             <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                             </svg>
@@ -848,7 +848,7 @@ const deleteAssignment = () => {
                             <a
                                 :href="`/storage/${previewFilePath}`"
                                 download
-                                class="inline-flex items-center gap-2 rounded-xl bg-[#FF6B35] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#E95521]"
+                                class="inline-flex items-center gap-2 rounded-xl bg-[#0E3BB0] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#0B2E8A]"
                             >
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

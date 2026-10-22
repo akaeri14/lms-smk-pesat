@@ -83,14 +83,14 @@ const submit = () => {
             <div class="flex items-center gap-3">
                 <Link
                     :href="route('classes.show', schoolClass.id)"
-                    class="text-sm font-medium text-slate-400 hover:text-[#FF6B35] transition"
+                    class="text-sm font-medium text-slate-400 hover:text-[#0E3BB0] transition"
                 >
                     {{ schoolClass.name }}
                 </Link>
                 <span class="text-slate-300">/</span>
                 <Link
                     :href="route('quizzes.show', quiz.id)"
-                    class="text-sm font-medium text-slate-400 hover:text-[#FF6B35] transition"
+                    class="text-sm font-medium text-slate-400 hover:text-[#0E3BB0] transition"
                 >
                     {{ quiz.title }}
                 </Link>
@@ -103,7 +103,7 @@ const submit = () => {
             <!-- Pengaturan Dasar Kuis -->
             <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
                 <div class="mb-6 border-b border-slate-100 pb-4">
-                    <span class="rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-[#E95521]">
+                    <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-[#0B2E8A]">
                         {{ schoolClass.name }} · {{ schoolClass.subject }}
                     </span>
                     <h3 class="mt-2 text-2xl font-extrabold text-slate-900">Edit Informasi Kuis</h3>
@@ -119,7 +119,7 @@ const submit = () => {
                         <input
                             v-model="form.title"
                             type="text"
-                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                             required
                         />
                         <InputError :message="form.errors.title" class="mt-1" />
@@ -133,7 +133,7 @@ const submit = () => {
                         <textarea
                             v-model="form.description"
                             rows="3"
-                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         />
                         <InputError :message="form.errors.description" class="mt-1" />
                     </div>
@@ -149,7 +149,7 @@ const submit = () => {
                                 type="number"
                                 min="1"
                                 max="180"
-                                class="block w-full rounded-xl border-slate-300 pr-12 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                                class="block w-full rounded-xl border-slate-300 pr-12 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                                 required
                             />
                             <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-xs font-bold text-slate-400">Menit</span>
@@ -184,7 +184,7 @@ const submit = () => {
                 >
                     <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                         <div class="flex items-center gap-2">
-                            <span class="grid h-7 w-7 place-items-center rounded-lg bg-[#FF6B35] text-xs font-extrabold text-white">
+                            <span class="grid h-7 w-7 place-items-center rounded-lg bg-[#0E3BB0] text-xs font-extrabold text-white">
                                 {{ qIndex + 1 }}
                             </span>
                             <span class="font-bold text-slate-800">Pertanyaan #{{ qIndex + 1 }}</span>
@@ -197,7 +197,7 @@ const submit = () => {
                                     type="number"
                                     min="1"
                                     max="100"
-                                    class="w-16 rounded-lg border-slate-200 py-1 text-center text-xs font-bold focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                                    class="w-16 rounded-lg border-slate-200 py-1 text-center text-xs font-bold focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                                 />
                             </div>
                             <button
@@ -219,7 +219,7 @@ const submit = () => {
                         <textarea
                             v-model="question.question_text"
                             rows="2"
-                            class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-1 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                             required
                         />
                     </div>
@@ -234,7 +234,7 @@ const submit = () => {
                                 v-if="question.options.length < 6"
                                 type="button"
                                 @click="addOption(qIndex)"
-                                class="text-xs font-bold text-[#FF6B35] hover:text-[#E95521]"
+                                class="text-xs font-bold text-[#0E3BB0] hover:text-[#0B2E8A]"
                             >
                                 + Tambah Opsi
                             </button>
@@ -294,7 +294,7 @@ const submit = () => {
                 <button
                     type="button"
                     @click="addQuestion"
-                    class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-5 text-sm font-bold text-slate-600 transition hover:border-orange-300 hover:bg-orange-50/40 hover:text-[#FF6B35]"
+                    class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-5 text-sm font-bold text-slate-600 transition hover:border-blue-300 hover:bg-blue-50/40 hover:text-[#0E3BB0]"
                 >
                     <span class="text-lg">+</span>
                     <span>Tambah Pertanyaan Soal Baru</span>
@@ -312,13 +312,13 @@ const submit = () => {
                 <button
                     type="submit"
                     :disabled="form.processing"
-                    class="inline-flex items-center gap-2 rounded-xl bg-[#FF6B35] px-7 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#E95521] disabled:opacity-50"
+                    class="inline-flex items-center gap-2 rounded-xl bg-[#0E3BB0] px-7 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#0B2E8A] disabled:opacity-50"
                 >
                     <svg v-if="form.processing" class="h-4 w-4 animate-spin text-white" viewBox="0 0 24 24" fill="none">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                     </svg>
-                    <span>{{ form.processing ? 'Menyimpan...' : '💾 Simpan Perubahan Kuis' }}</span>
+                    <span>{{ form.processing ? 'Menyimpan...' : 'Simpan Perubahan Kuis' }}</span>
                 </button>
             </div>
         </form>

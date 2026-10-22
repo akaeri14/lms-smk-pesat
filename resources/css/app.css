@@ -1,3 +1,9 @@
+:root {
+    --xpro-primary: #0E3BB0;
+    --xpro-accent: #FFA800;
+    --xpro-surface: #F8FAFC;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

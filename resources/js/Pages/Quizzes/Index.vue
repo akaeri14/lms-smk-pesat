@@ -40,7 +40,7 @@ const deleteQuiz = (quiz) => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between w-full">
-                <h2 class="text-xl font-bold text-slate-800">Game Kuis 🎮</h2>
+                <h2 class="text-xl font-bold text-slate-800">Game Kuis</h2>
 
                 <!-- Tombol Header untuk Guru & Admin -->
                 <div v-if="canCreateQuiz || user.role === 'guru' || user.role === 'admin'" class="flex items-center gap-2.5">
@@ -59,7 +59,7 @@ const deleteQuiz = (quiz) => {
                     <!-- Tombol Buat Kuis Baru (Manual) -->
                     <Link
                         :href="route('quizzes.create')"
-                        class="inline-flex items-center gap-1.5 rounded-xl bg-[#FF6B35] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#E95521]"
+                        class="inline-flex items-center gap-1.5 rounded-xl bg-[#0E3BB0] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#0B2E8A]"
                     >
                         <span>+ Buat Kuis Baru</span>
                     </Link>
@@ -90,19 +90,20 @@ const deleteQuiz = (quiz) => {
                 <div
                     v-for="quiz in quizzes"
                     :key="quiz.id"
-                    class="flex flex-col justify-between rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:border-orange-200 hover:shadow-md"
+                    class="flex flex-col justify-between rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:border-blue-200 hover:shadow-md"
                 >
                     <div>
                         <div class="flex items-center justify-between gap-2">
-                            <span class="rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-[#E95521]">
+                            <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-[#0B2E8A]">
                                 {{ quiz.school_class?.name }}
                             </span>
                             <span class="inline-flex items-center gap-1 text-xs font-semibold text-slate-400">
-                                ⏱ {{ quiz.duration_minutes }}m
+                                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="1.8" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 7v5l3 2" /></svg>
+                                {{ quiz.duration_minutes }}m
                             </span>
                         </div>
 
-                        <h4 class="mt-3 text-lg font-extrabold text-slate-800 hover:text-[#FF6B35] transition">
+                        <h4 class="mt-3 text-lg font-extrabold text-slate-800 hover:text-[#0E3BB0] transition">
                             {{ quiz.title }}
                         </h4>
 
@@ -111,7 +112,7 @@ const deleteQuiz = (quiz) => {
                         </p>
 
                         <div class="mt-4 flex items-center gap-3 text-xs text-slate-400">
-                            <span>📝 {{ quiz.questions_count ?? 0 }} Soal</span>
+                            <span>{{ quiz.questions_count ?? 0 }} Soal</span>
                             <span>•</span>
                             <span>{{ quiz.school_class?.subject }}</span>
                         </div>
@@ -124,7 +125,7 @@ const deleteQuiz = (quiz) => {
                             <div class="flex items-center gap-2">
                                 <Link
                                     :href="route('quizzes.edit', quiz.id)"
-                                    class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50 hover:text-[#FF6B35]"
+                                    class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50 hover:text-[#0E3BB0]"
                                 >
                                     Edit
                                 </Link>
@@ -137,7 +138,7 @@ const deleteQuiz = (quiz) => {
                                 </button>
                                 <Link
                                     :href="route('quizzes.show', quiz.id)"
-                                    class="inline-flex items-center gap-1 text-xs font-bold text-[#FF6B35] hover:text-[#E95521]"
+                                    class="inline-flex items-center gap-1 text-xs font-bold text-[#0E3BB0] hover:text-[#0B2E8A]"
                                 >
                                     <span>Detail</span><span>→</span>
                                 </Link>
@@ -163,9 +164,9 @@ const deleteQuiz = (quiz) => {
 
                             <Link
                                 :href="route('quizzes.play', quiz.id)"
-                                class="inline-flex items-center gap-1.5 rounded-xl bg-[#FF6B35] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#E95521]"
+                                class="inline-flex items-center gap-1.5 rounded-xl bg-[#0E3BB0] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#0B2E8A]"
                             >
-                                <span>🎮 {{ quiz.attempts?.[0] ? 'Main Lagi' : 'Mainkan' }}</span>
+                                <span>{{ quiz.attempts?.[0] ? 'Main Lagi' : 'Mainkan' }}</span>
                             </Link>
                         </div>
                     </div>
@@ -173,7 +174,7 @@ const deleteQuiz = (quiz) => {
             </div>
 
             <div v-else class="rounded-2xl border border-slate-100 bg-white p-12 text-center shadow-sm">
-                <span class="text-5xl">🎮</span>
+                <svg class="mx-auto h-12 w-12 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 3h6l1 4H8l1-4ZM7 7h10l2 12H5L7 7Z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 11h6M10 15h4" /></svg>
                 <h4 class="mt-4 text-lg font-bold text-slate-800">Belum Ada Game Kuis</h4>
                 <p class="mt-1 text-sm text-slate-500">
                     {{ user.role === 'guru' ? 'Buat kuis interaktif baru atau import dari file Excel.' : 'Belum ada game kuis yang tersedia untuk kelas Anda saat ini.' }}
@@ -184,11 +185,11 @@ const deleteQuiz = (quiz) => {
                         @click="showImportModal = true"
                         class="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-800 hover:bg-emerald-100"
                     >
-                        <span>📥 Import Excel</span>
+                        <span>Import Excel</span>
                     </button>
                     <Link
                         :href="route('quizzes.create')"
-                        class="rounded-xl bg-[#FF6B35] px-4 py-2 text-xs font-bold text-white hover:bg-[#E95521]"
+                        class="rounded-xl bg-[#0E3BB0] px-4 py-2 text-xs font-bold text-white hover:bg-[#0B2E8A]"
                     >
                         + Buat Kuis Baru
                     </Link>

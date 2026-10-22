@@ -55,11 +55,11 @@ const submit = () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center gap-3">
-                <Link :href="route('classes.show', schoolClass.id)" class="text-sm text-slate-400 hover:text-[#FF6B35]">
+                <Link :href="route('classes.show', schoolClass.id)" class="text-sm text-slate-400 hover:text-[#0E3BB0]">
                     {{ schoolClass.name }}
                 </Link>
                 <span class="text-slate-300">/</span>
-                <Link :href="route('assignments.show', assignment.id)" class="text-sm text-slate-400 hover:text-[#FF6B35]">
+                <Link :href="route('assignments.show', assignment.id)" class="text-sm text-slate-400 hover:text-[#0E3BB0]">
                     Tugas
                 </Link>
                 <span class="text-slate-300">/</span>
@@ -87,7 +87,7 @@ const submit = () => {
                     <input
                         v-model="form.title"
                         type="text"
-                        class="mt-2 block w-full rounded-xl border-slate-300 focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                        class="mt-2 block w-full rounded-xl border-slate-300 focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         placeholder="Contoh: Praktik HTML Dasar"
                         required
                     />
@@ -102,7 +102,7 @@ const submit = () => {
                     <textarea
                         v-model="form.description"
                         rows="7"
-                        class="mt-2 block w-full rounded-xl border-slate-300 focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                        class="mt-2 block w-full rounded-xl border-slate-300 focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         placeholder="Jelaskan tujuan, langkah pengerjaan, dan ketentuan tugas."
                     />
                     <InputError :message="form.errors.description" class="mt-1" />
@@ -115,7 +115,7 @@ const submit = () => {
                         <input
                             v-model="form.deadline"
                             type="datetime-local"
-                            class="mt-2 block w-full rounded-xl border-slate-300 focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-2 block w-full rounded-xl border-slate-300 focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         />
                         <InputError :message="form.errors.deadline" class="mt-1" />
                     </div>
@@ -125,7 +125,7 @@ const submit = () => {
                             v-model="form.max_score"
                             type="number"
                             min="1"
-                            class="mt-2 block w-full rounded-xl border-slate-300 focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-2 block w-full rounded-xl border-slate-300 focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         />
                         <InputError :message="form.errors.max_score" class="mt-1" />
                     </div>
@@ -144,7 +144,7 @@ const submit = () => {
                         <a
                             :href="`/storage/${assignment.file_path}`"
                             target="_blank"
-                            class="inline-flex items-center gap-1 text-xs font-bold text-[#FF6B35] underline hover:text-[#E95521]"
+                            class="inline-flex items-center gap-1 text-xs font-bold text-[#0E3BB0] underline hover:text-[#0B2E8A]"
                         >
                             {{ assignment.file_path.split('/').pop() }}
                         </a>
@@ -153,7 +153,7 @@ const submit = () => {
                     <input
                         type="file"
                         accept=".pdf,.docx,.xlsx,.png,.jpg,.jpeg,.zip"
-                        class="mt-2 block w-full rounded-xl border border-slate-300 text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-orange-50 file:px-4 file:py-2 file:font-bold file:text-[#E95521] transition hover:file:bg-orange-100 focus:outline-none"
+                        class="mt-2 block w-full rounded-xl border border-slate-300 text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:font-bold file:text-[#0B2E8A] transition hover:file:bg-blue-100 focus:outline-none"
                         @change="setAttachment"
                     />
                     <p class="mt-1 text-xs text-slate-400">Biarkan kosong jika tidak ingin mengganti lampiran yang ada.</p>
@@ -172,7 +172,7 @@ const submit = () => {
                 <button
                     type="submit"
                     :disabled="form.processing"
-                    class="inline-flex items-center gap-2 rounded-xl bg-[#FF6B35] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#E95521] disabled:opacity-50"
+                    class="inline-flex items-center gap-2 rounded-xl bg-[#0E3BB0] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#0B2E8A] disabled:opacity-50"
                 >
                     <svg
                         v-if="form.processing"

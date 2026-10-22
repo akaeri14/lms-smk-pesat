@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -51,10 +52,21 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
     Route::patch('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+    Route::post('/admin/users/sync-profiling', [UserController::class, 'syncProfiling'])->name('admin.users.sync-profiling');
+
+    // Admin & developer integration documentation and token management.
+    Route::get('/admin/api-docs', [ApiDocsController::class, 'index'])->middleware('role:admin')->name('admin.api-docs.index');
+    Route::post('/admin/api-docs/tokens', [ApiDocsController::class, 'createToken'])->middleware('role:admin')->name('admin.api-docs.tokens.store');
+    Route::delete('/admin/api-docs/tokens/api/{token}', [ApiDocsController::class, 'destroyApiToken'])->middleware('role:admin')->name('admin.api-docs.tokens.api.destroy');
+    Route::delete('/admin/api-docs/tokens/sso/{token}', [ApiDocsController::class, 'destroySsoToken'])->middleware('role:admin')->name('admin.api-docs.tokens.sso.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/sso/authorize', [ApiDocsController::class, 'ssoAuthorize'])
+    ->middleware('throttle:10,1')
+    ->name('sso.authorize');
 
 require __DIR__.'/auth.php';

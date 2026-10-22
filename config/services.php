@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    'profiling' => [
+        'base_url' => env('PROFILING_API_URL', 'https://dev-profiling.smkpesat.id/api/v1'),
+        'key' => env('PROFILING_API_KEY'),
+        'auth_header' => env('PROFILING_API_AUTH_HEADER', 'X-API-KEY'),
+        'auth_scheme' => env('PROFILING_API_AUTH_SCHEME'),
+        'timeout' => (int) env('PROFILING_API_TIMEOUT', 15),
+        'cache_ttl' => (int) env('PROFILING_API_CACHE_TTL', 300),
+        'endpoints' => [
+            'students' => env('PROFILING_API_STUDENTS_ENDPOINT', 'students'),
+            'teachers' => env('PROFILING_API_TEACHERS_ENDPOINT', 'teachers'),
+            'profiles' => env('PROFILING_API_PROFILES_ENDPOINT', 'profiles'),
+        ],
+    ],
+
 ];

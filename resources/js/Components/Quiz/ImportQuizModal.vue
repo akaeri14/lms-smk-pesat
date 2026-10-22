@@ -110,7 +110,7 @@ const submitImport = () => {
             </div>
 
             <!-- Banner Unduh Template -->
-            <div class="rounded-xl border border-orange-200 bg-orange-50/70 p-4">
+            <div class="rounded-xl border border-blue-200 bg-blue-50/70 p-4">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <span class="text-xs font-bold text-slate-800">Format Template Spreadsheet</span>
@@ -121,9 +121,9 @@ const submitImport = () => {
                     <a
                         :href="route('quizzes.template-excel')"
                         download
-                        class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-white px-3.5 py-2 text-xs font-bold text-[#E95521] shadow-sm border border-orange-200 hover:bg-orange-50 transition"
+                        class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-white px-3.5 py-2 text-xs font-bold text-[#0B2E8A] shadow-sm border border-blue-200 hover:bg-blue-50 transition"
                     >
-                        <span>📥 Unduh Template (.xlsx)</span>
+                        <span>Unduh Template (.xlsx)</span>
                     </a>
                 </div>
             </div>
@@ -137,7 +137,7 @@ const submitImport = () => {
                     </label>
                     <select
                         v-model="form.class_id"
-                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         required
                     >
                         <option value="" disabled>Pilih Kelas</option>
@@ -157,7 +157,7 @@ const submitImport = () => {
                         v-model="form.title"
                         type="text"
                         placeholder="Contoh: Kuis Bab 2 - Jaringan Komputer"
-                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         required
                     />
                     <InputError :message="form.errors.title" class="mt-1" />
@@ -175,7 +175,7 @@ const submitImport = () => {
                             min="1"
                             max="180"
                             placeholder="Default: 15"
-                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         />
                         <InputError :message="form.errors.duration_minutes" class="mt-1" />
                     </div>
@@ -188,7 +188,7 @@ const submitImport = () => {
                             v-model="form.description"
                             type="text"
                             placeholder="Catatan kuis..."
-                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         />
                         <InputError :message="form.errors.description" class="mt-1" />
                     </div>
@@ -223,7 +223,7 @@ const submitImport = () => {
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="inline-flex items-center gap-2 rounded-xl bg-[#FF6B35] px-6 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#E95521] disabled:opacity-50"
+                        class="inline-flex items-center gap-2 rounded-xl bg-[#0E3BB0] px-6 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#0B2E8A] disabled:opacity-50"
                     >
                         <svg
                             v-if="form.processing"

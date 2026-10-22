@@ -233,9 +233,9 @@ onUnmounted(() => {
 <template>
     <Head :title="`Game Kuis: ${quiz.title}`" />
 
-    <div class="min-h-screen bg-slate-950 text-white selection:bg-[#FF6B35] selection:text-white flex flex-col justify-between font-sans relative overflow-hidden">
+    <div class="min-h-screen bg-slate-950 text-white selection:bg-[#0E3BB0] selection:text-white flex flex-col justify-between font-sans relative overflow-hidden">
         <!-- Background Glow Accent (Modern Game Feel) -->
-        <div class="pointer-events-none absolute -top-40 -left-40 h-96 w-96 rounded-full bg-[#FF6B35]/20 blur-3xl"></div>
+        <div class="pointer-events-none absolute -top-40 -left-40 h-96 w-96 rounded-full bg-[#0E3BB0]/20 blur-3xl"></div>
         <div class="pointer-events-none absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-indigo-500/20 blur-3xl"></div>
 
         <!-- ============================================================== -->
@@ -265,17 +265,18 @@ onUnmounted(() => {
                     class="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 transition"
                     :title="soundEnabled ? 'Matikan Suara' : 'Nyalakan Suara'"
                 >
-                    <span>{{ soundEnabled ? '🔊' : '🔇' }}</span>
+                    <svg v-if="soundEnabled" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5 6 9H3v6h3l5 4V5ZM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" /></svg>
+                    <svg v-else class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m11 5-5 4H3v6h3l5 4V5ZM18 9l-5 6m0-6 5 6" /></svg>
                 </button>
 
                 <div v-if="gameState === 'playing'" class="flex items-center gap-3">
-                    <div class="flex items-center gap-1.5 rounded-xl border border-orange-500/30 bg-orange-500/10 px-3 py-1.5 text-xs font-bold text-[#FF6B35]">
-                        <span>⏱</span>
+                    <div class="flex items-center gap-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 text-xs font-bold text-[#0E3BB0]">
+                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="1.8" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 7v5l3 2" /></svg>
                         <span>{{ formattedTime }}</span>
                     </div>
 
                     <div class="hidden sm:flex items-center gap-1 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-400">
-                        <span>🔥 {{ streak }}x Streak</span>
+                        <span>{{ streak }}x Streak</span>
                     </div>
                 </div>
             </div>
@@ -286,8 +287,8 @@ onUnmounted(() => {
         <!-- ============================================================== -->
         <main v-if="gameState === 'ready'" class="relative z-10 flex-1 flex items-center justify-center p-6">
             <div class="w-full max-w-xl text-center space-y-6">
-                <div class="inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-1.5 text-xs font-bold text-[#FF6B35] animate-pulse">
-                    <span>🎮 MODE GAME KUIS INTERAKTIF</span>
+                <div class="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-bold text-[#0E3BB0] animate-pulse">
+                    <span>MODE GAME KUIS INTERAKTIF</span>
                 </div>
 
                 <div class="space-y-3">
@@ -319,9 +320,9 @@ onUnmounted(() => {
                 <button
                     type="button"
                     @click="startQuiz"
-                    class="group relative inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-[#FF6B35] to-[#FF5722] p-5 text-lg font-black tracking-wide text-white shadow-xl shadow-orange-500/25 transition-all hover:scale-[1.02] hover:shadow-orange-500/40 active:scale-[0.98]"
+                    class="group relative inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-[#0E3BB0] to-[#1D4ED8] p-5 text-lg font-black tracking-wide text-white shadow-xl shadow-blue-500/25 transition-all hover:scale-[1.02] hover:shadow-blue-500/40 active:scale-[0.98]"
                 >
-                    <span class="text-2xl transition-transform group-hover:translate-x-1">🚀</span>
+                    <svg class="h-6 w-6 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14 4c3.5-1 6-1 6-1s0 2.5-1 6c-1.2 3.9-4.1 6.8-8 8l-3 1 1-3c1.2-3.9 4.1-6.8 8-8Z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m8 16-3 3M6 12l-3 1 3 2m5 3 1 3 2-3" /><circle cx="15" cy="9" r="1.5" /></svg>
                     <span>MULAI MAIN SEKARANG!</span>
                 </button>
             </div>
@@ -339,7 +340,7 @@ onUnmounted(() => {
                 </div>
                 <div class="h-2.5 w-full rounded-full bg-white/10 overflow-hidden">
                     <div
-                        class="h-full bg-gradient-to-r from-[#FF6B35] to-orange-400 transition-all duration-300 rounded-full"
+                        class="h-full bg-gradient-to-r from-[#0E3BB0] to-blue-400 transition-all duration-300 rounded-full"
                         :style="{ width: `${progressPercentage}%` }"
                     ></div>
                 </div>
@@ -348,7 +349,7 @@ onUnmounted(() => {
             <!-- Question Card -->
             <div class="flex-1 flex items-center justify-center my-4">
                 <div class="w-full rounded-3xl border border-white/10 bg-slate-900/80 p-8 sm:p-12 text-center shadow-2xl backdrop-blur-xl">
-                    <span class="inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-orange-300 mb-4">
+                    <span class="inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-blue-300 mb-4">
                         Soal #{{ currentQuestionIndex + 1 }} · {{ currentQuestion.points }} Poin
                     </span>
                     <h3 class="text-2xl sm:text-4xl font-extrabold leading-snug text-white">
@@ -393,9 +394,9 @@ onUnmounted(() => {
             <div class="w-full max-w-3xl space-y-8">
                 <!-- Result Banner -->
                 <div class="rounded-3xl border border-white/10 bg-slate-900/90 p-8 text-center shadow-2xl backdrop-blur-xl relative overflow-hidden">
-                    <div class="absolute -top-24 left-1/2 -translate-x-1/2 h-48 w-48 rounded-full bg-orange-500/20 blur-2xl pointer-events-none"></div>
+                    <div class="absolute -top-24 left-1/2 -translate-x-1/2 h-48 w-48 rounded-full bg-blue-500/20 blur-2xl pointer-events-none"></div>
 
-                    <span class="text-6xl animate-bounce inline-block">🏆</span>
+                    <svg class="mx-auto h-16 w-16 animate-bounce text-[#FFB547]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4M9 21h6" /></svg>
                     <h2 class="mt-3 text-3xl sm:text-4xl font-black text-white">
                         Kuis Berhasil Diselesaikan!
                     </h2>
@@ -405,9 +406,9 @@ onUnmounted(() => {
 
                     <!-- Score Card -->
                     <div class="mt-6 flex flex-wrap items-center justify-center gap-6">
-                        <div class="rounded-2xl border border-orange-500/30 bg-orange-500/10 px-8 py-5 text-center">
-                            <span class="text-xs font-bold uppercase tracking-wider text-orange-300">Skor Akhir</span>
-                            <p class="text-4xl sm:text-5xl font-black text-[#FF6B35] mt-1">
+                        <div class="rounded-2xl border border-blue-500/30 bg-blue-500/10 px-8 py-5 text-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-blue-300">Skor Akhir</span>
+                            <p class="text-4xl sm:text-5xl font-black text-[#0E3BB0] mt-1">
                                 {{ myAttempt?.score ?? 0 }} <span class="text-2xl font-bold text-slate-400">/ 100</span>
                             </p>
                         </div>
@@ -425,9 +426,9 @@ onUnmounted(() => {
                         <button
                             type="button"
                             @click="startQuiz"
-                            class="rounded-xl bg-[#FF6B35] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#E95521] shadow-lg shadow-orange-500/25"
+                            class="rounded-xl bg-[#0E3BB0] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#0B2E8A] shadow-lg shadow-blue-500/25"
                         >
-                            🎮 Mainkan Ulang Kuis
+                            Mainkan Ulang Kuis
                         </button>
                         <Link
                             :href="route('classes.show', quiz.class_id)"
@@ -442,7 +443,7 @@ onUnmounted(() => {
                 <div class="rounded-3xl border border-white/10 bg-slate-900/80 p-6 sm:p-8 shadow-xl backdrop-blur-md">
                     <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
                         <div class="flex items-center gap-2">
-                            <span class="text-2xl">🥇</span>
+                            <span class="grid h-8 w-8 place-items-center rounded-full bg-[#FFB547]/15 text-sm font-black text-[#FFB547]">1</span>
                             <h3 class="text-lg font-bold text-white">Leaderboard Kelas</h3>
                         </div>
                         <span class="text-xs text-slate-400">Top Skor Tercepat</span>
@@ -454,7 +455,7 @@ onUnmounted(() => {
                             :key="item.id"
                             :class="[
                                 'flex items-center justify-between py-3.5 px-3 rounded-xl transition',
-                                item.user_id === user.id ? 'bg-orange-500/15 border border-orange-500/30 font-bold' : ''
+                                item.user_id === user.id ? 'bg-blue-500/15 border border-blue-500/30 font-bold' : ''
                             ]"
                         >
                             <div class="flex items-center gap-3">
@@ -471,11 +472,11 @@ onUnmounted(() => {
 
                                 <span class="text-sm font-medium text-white">
                                     {{ item.user?.name }}
-                                    <span v-if="item.user_id === user.id" class="text-xs text-[#FF6B35] font-bold">(Anda)</span>
+                                    <span v-if="item.user_id === user.id" class="text-xs text-[#0E3BB0] font-bold">(Anda)</span>
                                 </span>
                             </div>
 
-                            <span class="text-sm font-black text-[#FF6B35]">
+                            <span class="text-sm font-black text-[#0E3BB0]">
                                 {{ item.score }} Pts
                             </span>
                         </div>

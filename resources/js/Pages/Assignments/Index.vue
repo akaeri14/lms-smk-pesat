@@ -85,11 +85,11 @@ const deleteAssignment = (assignment) => {
                     v-for="assignment in assignments"
                     :key="assignment.id"
                     :href="route('assignments.show', assignment.id)"
-                    class="group flex flex-col justify-between gap-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm transition hover:border-orange-200 hover:shadow-md sm:flex-row sm:items-center"
+                    class="group flex flex-col justify-between gap-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md sm:flex-row sm:items-center"
                 >
                     <div class="space-y-1.5">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-bold text-[#E95521]">
+                            <span class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-[#0B2E8A]">
                                 {{ assignment.school_class?.name }}
                             </span>
                             <span v-if="assignment.school_class?.subject" class="text-xs text-slate-400">
@@ -97,7 +97,7 @@ const deleteAssignment = (assignment) => {
                             </span>
                         </div>
 
-                        <h4 class="text-base font-bold text-slate-800 group-hover:text-[#FF6B35] transition">
+                        <h4 class="text-base font-bold text-slate-800 group-hover:text-[#0E3BB0] transition">
                             {{ assignment.title }}
                         </h4>
 
@@ -111,7 +111,7 @@ const deleteAssignment = (assignment) => {
                     <div class="flex flex-wrap items-center gap-3">
                         <!-- Indikator Pengumpulan untuk Guru / Admin -->
                         <div v-if="user.role === 'guru' || user.role === 'admin'" class="flex items-center">
-                            <span class="inline-flex items-center gap-1.5 rounded-lg border border-orange-100 bg-orange-50/70 px-3 py-1.5 text-xs font-bold text-[#E95521]">
+                            <span class="inline-flex items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50/70 px-3 py-1.5 text-xs font-bold text-[#0B2E8A]">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
@@ -136,7 +136,7 @@ const deleteAssignment = (assignment) => {
                             <Link
                                 :href="route('assignments.edit', assignment.id)"
                                 @click.stop
-                                class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50 hover:text-[#FF6B35]"
+                                class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50 hover:text-[#0E3BB0]"
                             >
                                 Edit
                             </Link>
@@ -149,7 +149,7 @@ const deleteAssignment = (assignment) => {
                             </button>
                         </template>
 
-                        <span class="hidden text-slate-300 group-hover:text-[#FF6B35] transition sm:inline">
+                        <span class="hidden text-slate-300 group-hover:text-[#0E3BB0] transition sm:inline">
                             →
                         </span>
                     </div>

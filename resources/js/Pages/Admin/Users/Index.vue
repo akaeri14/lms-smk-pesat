@@ -34,6 +34,15 @@ const resetFilters = () => {
     roleFilter.value = '';
 };
 
+const isSyncing = ref(false);
+const syncProfiling = () => {
+    isSyncing.value = true;
+    router.post(route('admin.users.sync-profiling'), {}, {
+        preserveScroll: true,
+        onFinish: () => { isSyncing.value = false; },
+    });
+};
+
 // =============================================
 // Modal Tambah User Baru
 // =============================================
@@ -145,16 +154,25 @@ const formatDate = (d) => {
                     <h2 class="text-xl font-bold text-slate-800">Manajemen Pengguna</h2>
                     <p class="mt-0.5 text-xs text-slate-500">Kelola semua akun pengguna dalam sistem LMS SMK Pesat.</p>
                 </div>
-                <button
-                    type="button"
-                    @click="showAddModal = true"
-                    class="inline-flex items-center gap-1.5 rounded-xl bg-[#FF6B35] px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#E95521]"
-                >
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>Tambah Pengguna</span>
-                </button>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button
+                        type="button"
+                        :disabled="isSyncing"
+                        @click="syncProfiling"
+                        class="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-bold text-[#0B2E8A] shadow-sm transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        <svg class="h-4 w-4" :class="isSyncing ? 'animate-spin' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M5.1 9A7 7 0 0 1 17 5.3L20 8M19 15a7 7 0 0 1-11.9 3.7L4 16" /></svg>
+                        <span>{{ isSyncing ? 'Sinkronisasi...' : 'Sync API Profiling' }}</span>
+                    </button>
+                    <button
+                        type="button"
+                        @click="showAddModal = true"
+                        class="inline-flex items-center gap-1.5 rounded-xl bg-[#0E3BB0] px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#0B2E8A]"
+                    >
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                        <span>Tambah Pengguna</span>
+                    </button>
+                </div>
             </div>
         </template>
 
@@ -169,6 +187,12 @@ const formatDate = (d) => {
                 </svg>
                 <span>{{ flash.success }}</span>
             </div>
+            <div
+                v-if="flash.error"
+                class="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-800 shadow-sm"
+            >
+                <span>{{ flash.error }}</span>
+            </div>
 
             <!-- Filter Bar -->
             <div class="flex flex-col gap-3 rounded-xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
@@ -181,14 +205,14 @@ const formatDate = (d) => {
                         v-model="search"
                         type="text"
                         placeholder="Cari nama atau email pengguna..."
-                        class="block w-full rounded-xl border-slate-300 pl-9 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                        class="block w-full rounded-xl border-slate-300 pl-9 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                     />
                 </div>
 
                 <!-- Role Filter -->
                 <select
                     v-model="roleFilter"
-                    class="rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35] sm:w-40"
+                    class="rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0] sm:w-40"
                 >
                     <option value="">Semua Role</option>
                     <option value="admin">Admin</option>
@@ -228,7 +252,7 @@ const formatDate = (d) => {
                             <!-- Nama + Avatar -->
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-orange-100 text-sm font-extrabold text-[#E95521]">
+                                    <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-100 text-sm font-extrabold text-[#0B2E8A]">
                                         {{ user.name.slice(0, 1).toUpperCase() }}
                                     </div>
                                     <div>
@@ -261,7 +285,7 @@ const formatDate = (d) => {
                                     <button
                                         type="button"
                                         @click="openEditModal(user)"
-                                        class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#FF6B35]"
+                                        class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#0E3BB0]"
                                     >
                                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -340,7 +364,7 @@ const formatDate = (d) => {
                     <input
                         v-model="addForm.name"
                         type="text"
-                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         required
                     />
                     <InputError :message="addForm.errors.name" class="mt-1" />
@@ -354,7 +378,7 @@ const formatDate = (d) => {
                     <input
                         v-model="addForm.email"
                         type="email"
-                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         required
                     />
                     <InputError :message="addForm.errors.email" class="mt-1" />
@@ -369,7 +393,7 @@ const formatDate = (d) => {
                         <input
                             v-model="addForm.password"
                             type="password"
-                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                             required
                             minlength="8"
                         />
@@ -380,7 +404,7 @@ const formatDate = (d) => {
                         <input
                             v-model="addForm.phone"
                             type="text"
-                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         />
                         <InputError :message="addForm.errors.phone" class="mt-1" />
                     </div>
@@ -400,7 +424,7 @@ const formatDate = (d) => {
                             :class="[
                                 'flex-1 rounded-xl border py-2 text-xs font-bold capitalize transition',
                                 addForm.role === r
-                                    ? 'border-[#FF6B35] bg-orange-50 text-[#E95521]'
+                                    ? 'border-[#0E3BB0] bg-blue-50 text-[#0B2E8A]'
                                     : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300',
                             ]"
                         >
@@ -417,7 +441,7 @@ const formatDate = (d) => {
                     <button
                         type="submit"
                         :disabled="addForm.processing"
-                        class="inline-flex items-center gap-2 rounded-xl bg-[#FF6B35] px-6 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#E95521] disabled:opacity-50"
+                        class="inline-flex items-center gap-2 rounded-xl bg-[#0E3BB0] px-6 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#0B2E8A] disabled:opacity-50"
                     >
                         <svg v-if="addForm.processing" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -449,7 +473,7 @@ const formatDate = (d) => {
                     <input
                         v-model="editForm.name"
                         type="text"
-                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         required
                     />
                     <InputError :message="editForm.errors.name" class="mt-1" />
@@ -462,7 +486,7 @@ const formatDate = (d) => {
                     <input
                         v-model="editForm.email"
                         type="email"
-                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                        class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         required
                     />
                     <InputError :message="editForm.errors.email" class="mt-1" />
@@ -476,7 +500,7 @@ const formatDate = (d) => {
                         <input
                             v-model="editForm.password"
                             type="password"
-                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                             minlength="8"
                         />
                         <InputError :message="editForm.errors.password" class="mt-1" />
@@ -486,7 +510,7 @@ const formatDate = (d) => {
                         <input
                             v-model="editForm.phone"
                             type="text"
-                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#FF6B35] focus:ring-[#FF6B35]"
+                            class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]"
                         />
                         <InputError :message="editForm.errors.phone" class="mt-1" />
                     </div>
@@ -505,7 +529,7 @@ const formatDate = (d) => {
                             :class="[
                                 'flex-1 rounded-xl border py-2 text-xs font-bold capitalize transition',
                                 editForm.role === r
-                                    ? 'border-[#FF6B35] bg-orange-50 text-[#E95521]'
+                                    ? 'border-[#0E3BB0] bg-blue-50 text-[#0B2E8A]'
                                     : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300',
                             ]"
                         >
@@ -522,7 +546,7 @@ const formatDate = (d) => {
                     <button
                         type="submit"
                         :disabled="editForm.processing"
-                        class="inline-flex items-center gap-2 rounded-xl bg-[#FF6B35] px-6 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#E95521] disabled:opacity-50"
+                        class="inline-flex items-center gap-2 rounded-xl bg-[#0E3BB0] px-6 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#0B2E8A] disabled:opacity-50"
                     >
                         <svg v-if="editForm.processing" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

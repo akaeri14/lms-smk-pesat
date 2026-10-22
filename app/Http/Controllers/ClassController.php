@@ -9,6 +9,7 @@ use App\Models\Assignment;
 use App\Models\SchoolClass;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -51,13 +52,25 @@ class ClassController extends Controller
         $this->authorize('view', $schoolClass);
 
         $user = $request->user();
+        $canManage = $user->can('update', $schoolClass);
 
         $schoolClass->load([
             'teacher:id,name,email',
-            'students:id,name,email,avatar',
+            'students' => function ($query) use ($canManage): void {
+                // Relasi belongsToMany menggabungkan users dengan class_user;
+                // kualifikasi nama tabel mencegah kolom id menjadi ambigu.
+                $columns = ['users.id', 'users.name', 'users.email', 'users.avatar'];
+                if ($canManage) {
+                    $columns = [...$columns, 'users.profiling_data', 'users.profiling_synced_at'];
+                }
+                $query->select($columns);
+            },
             'assignments' => fn ($query) => $query
                 ->with('creator:id,name')
                 ->withCount('submissions')
+                ->when($canManage, fn ($q) => $q->with([
+                    'submissions:id,assignment_id,student_id,submitted_at,status,score',
+                ]))
                 ->when($user->role === 'siswa', fn ($q) => $q->with([
                     'submissions' => fn ($subQuery) => $subQuery->where('student_id', $user->id),
                 ]))
@@ -65,6 +78,9 @@ class ClassController extends Controller
             'quizzes' => fn ($query) => $query
                 ->with('creator:id,name')
                 ->withCount(['questions', 'attempts'])
+                ->when($canManage, fn ($q) => $q->with([
+                    'attempts:id,quiz_id,user_id,score,total_correct,total_questions,completed_at',
+                ]))
                 ->when($user->role === 'siswa', fn ($q) => $q->with([
                     'attempts' => fn ($aq) => $aq->where('user_id', $user->id)->latest('completed_at'),
                 ]))
@@ -73,10 +89,141 @@ class ClassController extends Controller
 
         return Inertia::render('Classes/Show', [
             'schoolClass' => $schoolClass,
-            'canManage' => $request->user()->can('update', $schoolClass),
+            'canManage' => $canManage,
             'canCreateAssignment' => $request->user()->can('create', [Assignment::class, $schoolClass]),
             'canCreateQuiz' => $user->role === 'admin' || ($user->role === 'guru' && $schoolClass->teacher_id === $user->id),
+            'profilingSummary' => $canManage ? $this->buildProfilingSummary($schoolClass->students) : null,
+            'gradebook' => $canManage ? $this->buildGradebook($schoolClass) : null,
         ]);
+    }
+
+    private function buildGradebook(SchoolClass $schoolClass): array
+    {
+        $items = collect();
+
+        foreach ($schoolClass->assignments as $assignment) {
+            $items->push([
+                'key' => 'assignment-'.$assignment->id,
+                'type' => 'assignment',
+                'id' => $assignment->id,
+                'title' => $assignment->title,
+                'due_at' => $assignment->deadline?->toIso8601String(),
+                'max_score' => (int) $assignment->max_score,
+            ]);
+        }
+
+        foreach ($schoolClass->quizzes as $quiz) {
+            $items->push([
+                'key' => 'quiz-'.$quiz->id,
+                'type' => 'quiz',
+                'id' => $quiz->id,
+                'title' => $quiz->title,
+                'due_at' => null,
+                'max_score' => 100,
+            ]);
+        }
+
+        $rows = $schoolClass->students->map(function ($student) use ($schoolClass, $items): array {
+            $grades = [];
+
+            foreach ($schoolClass->assignments as $assignment) {
+                $submission = $assignment->submissions->firstWhere('student_id', $student->id);
+                $isPastDue = $assignment->deadline && $assignment->deadline->isPast();
+                $grades['assignment-'.$assignment->id] = $this->gradebookCell(
+                    $submission?->score,
+                    $submission ? ($submission->score !== null ? 'graded' : 'submitted') : ($isPastDue ? 'missing' : 'pending'),
+                );
+            }
+
+            foreach ($schoolClass->quizzes as $quiz) {
+                $attempt = $quiz->attempts->firstWhere('user_id', $student->id);
+                $grades['quiz-'.$quiz->id] = $this->gradebookCell(
+                    $attempt?->score,
+                    $attempt ? 'graded' : 'pending',
+                );
+            }
+
+            return [
+                'student' => [
+                    'id' => $student->id,
+                    'name' => $student->name,
+                    'email' => $student->email,
+                ],
+                'grades' => $grades,
+            ];
+        })->values()->all();
+
+        $averages = [];
+        foreach ($items as $item) {
+            $scores = collect($rows)
+                ->map(fn (array $row) => $row['grades'][$item['key']]['score'] ?? null)
+                ->filter(fn ($score) => $score !== null)
+                ->values();
+
+            $averages[$item['key']] = $scores->isEmpty()
+                ? null
+                : round($scores->avg(), 1);
+        }
+
+        return [
+            'students_count' => count($rows),
+            'items' => $items->values()->all(),
+            'rows' => $rows,
+            'averages' => $averages,
+        ];
+    }
+
+    private function gradebookCell(?int $score, string $status): array
+    {
+        return [
+            'score' => $score,
+            'status' => $status,
+        ];
+    }
+
+    /** @param \Illuminate\Support\Collection<int, \App\Models\User> $students */
+    private function buildProfilingSummary($students): array
+    {
+        $counts = ['visual' => 0, 'auditori' => 0, 'kinestetik' => 0];
+        $profiled = 0;
+
+        foreach ($students as $student) {
+            $data = is_array($student->profiling_data) ? $student->profiling_data : [];
+            $style = collect([
+                Arr::get($data, 'gaya_belajar'),
+                Arr::get($data, 'gayaBelajar'),
+                Arr::get($data, 'learning_style'),
+                Arr::get($data, 'learningStyle'),
+                Arr::get($data, 'analysis.gaya_belajar'),
+                Arr::get($data, 'hasil.gaya_belajar'),
+            ])->filter()->map(fn ($value) => strtolower((string) $value))->first();
+
+            if (! $style) {
+                continue;
+            }
+
+            $key = str_contains($style, 'visual')
+                ? 'visual'
+                : (str_contains($style, 'aud') ? 'auditori' : (str_contains($style, 'kin') ? 'kinestetik' : null));
+
+            if ($key) {
+                $counts[$key]++;
+                $profiled++;
+            }
+        }
+
+        return [
+            'total_students' => $students->count(),
+            'profiled_students' => $profiled,
+            'distribution' => collect($counts)->map(function ($count, $key) use ($profiled) {
+                return [
+                    'key' => $key,
+                    'label' => ucfirst($key),
+                    'count' => $count,
+                    'percentage' => $profiled > 0 ? (int) round(($count / $profiled) * 100) : 0,
+                ];
+            })->values()->all(),
+        ];
     }
 
     public function update(UpdateClassRequest $request, SchoolClass $schoolClass): RedirectResponse

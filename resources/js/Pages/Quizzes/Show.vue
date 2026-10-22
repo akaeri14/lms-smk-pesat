@@ -57,7 +57,7 @@ const deleteQuiz = () => {
             <div class="flex items-center gap-3">
                 <Link
                     :href="route('classes.show', quiz.class_id)"
-                    class="text-sm font-medium text-slate-400 hover:text-[#FF6B35] transition"
+                    class="text-sm font-medium text-slate-400 hover:text-[#0E3BB0] transition"
                 >
                     {{ quiz.school_class?.name || 'Kelas' }}
                 </Link>
@@ -86,7 +86,7 @@ const deleteQuiz = () => {
             <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
                 <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
                     <div class="space-y-3">
-                        <span class="inline-block rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-[#E95521]">
+                        <span class="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-[#0B2E8A]">
                             {{ quiz.school_class?.subject || 'Mata Pelajaran' }}
                         </span>
                         <h1 class="text-2xl font-extrabold text-slate-900 sm:text-3xl">
@@ -117,16 +117,16 @@ const deleteQuiz = () => {
                 <div class="mt-6 flex flex-wrap items-center gap-3">
                     <Link
                         :href="route('quizzes.play', quiz.id)"
-                        class="inline-flex items-center gap-2 rounded-xl bg-[#FF6B35] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#E95521]"
+                        class="inline-flex items-center gap-2 rounded-xl bg-[#0E3BB0] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#0B2E8A]"
                     >
-                        <span>🎮 Mainkan Game Kuis</span>
+                        <span>Mainkan Game Kuis</span>
                     </Link>
 
                     <!-- Tombol Edit & Hapus Khusus Guru/Admin -->
                     <template v-if="canManage">
                         <Link
                             :href="route('quizzes.edit', quiz.id)"
-                            class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#FF6B35]"
+                            class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#0E3BB0]"
                         >
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -158,7 +158,7 @@ const deleteQuiz = () => {
             <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div>
-                        <h3 class="text-xl font-extrabold text-slate-800">Papan Peringkat & Rekap Nilai 🏆</h3>
+                        <h3 class="text-xl font-extrabold text-slate-800">Papan Peringkat & Rekap Nilai</h3>
                         <p class="mt-1 text-xs text-slate-500">
                             Total {{ leaderboard.length }} pengerjaan tercatat dari siswa di kelas.
                         </p>
@@ -177,10 +177,10 @@ const deleteQuiz = () => {
                                     'grid h-8 w-8 place-items-center rounded-xl text-xs font-black',
                                     rank === 0 ? 'bg-amber-100 text-amber-800 border border-amber-300' :
                                     rank === 1 ? 'bg-slate-200 text-slate-700 border border-slate-300' :
-                                    rank === 2 ? 'bg-orange-100 text-orange-800 border border-orange-200' : 'bg-slate-50 text-slate-500'
+                                    rank === 2 ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-slate-50 text-slate-500'
                                 ]"
                             >
-                                {{ rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : (rank + 1) }}
+                                {{ rank + 1 }}
                             </span>
 
                             <div>
@@ -192,7 +192,7 @@ const deleteQuiz = () => {
                         </div>
 
                         <div class="text-right">
-                            <span class="text-lg font-black text-[#FF6B35]">{{ item.score }}</span>
+                            <span class="text-lg font-black text-[#0E3BB0]">{{ item.score }}</span>
                             <span class="text-xs font-bold text-slate-400"> / 100</span>
                         </div>
                     </div>

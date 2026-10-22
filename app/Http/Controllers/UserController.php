@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -139,5 +140,20 @@ class UserController extends Controller
         $user->delete();
 
         return back()->with('success', "Pengguna '{$name}' berhasil dihapus dari sistem.");
+    }
+
+    /** Jalankan sinkronisasi Profiling API dari panel admin. */
+    public function syncProfiling(Request $request): RedirectResponse
+    {
+        $this->authorizeAdmin($request);
+
+        $exitCode = Artisan::call('sync:profiling-data', ['--fresh' => true]);
+        $output = trim(Artisan::output());
+
+        if ($exitCode !== 0) {
+            return back()->with('error', 'Sinkronisasi Profiling gagal.'.($output ? ' '.$output : ''));
+        }
+
+        return back()->with('success', 'Sinkronisasi Profiling berhasil dijalankan.');
     }
 }
