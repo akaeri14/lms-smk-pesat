@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ScoreUpdated;
+use App\Events\AnswerSubmitted;
 use App\Events\QuizScoreUpdated;
 use App\Events\QuizGameStateUpdated;
 use App\Events\QuizStarted;
 use App\Events\QuizEnded;
 use App\Events\ParticipantJoined;
+use App\Events\QuizTeamScoresUpdated;
+use App\Events\CrownTransferred;
 use App\Models\Quiz;
 use App\Models\QuizAudioTrack;
 use App\Models\QuizAttempt;
 use App\Models\SchoolClass;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -82,9 +87,15 @@ class QuizController extends Controller
             ? $schoolClass->only('id', 'name', 'subject')
             : ($classes->first() ? $classes->first()->only('id', 'name', 'subject') : null);
 
+        $selectedGameMode = $request->input('game_mode', 'live_individual');
+        if (! in_array($selectedGameMode, ['live_individual', 'assign', 'team_battle', 'steal_crown'], true)) {
+            $selectedGameMode = 'live_individual';
+        }
+
         return Inertia::render('Quizzes/Create', [
             'schoolClass' => $selectedClass,
             'classes' => $classes,
+            'initialGameMode' => $selectedGameMode,
         ]);
     }
 
@@ -107,6 +118,7 @@ class QuizController extends Controller
             'duration_minutes' => ['required', 'integer', 'min:1', 'max:180'],
             'max_attempts' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:20'],
             'quiz_mode' => ['sometimes', 'in:live,assign'],
+            'game_mode' => ['sometimes', 'in:live_individual,assign,team_battle,steal_crown'],
             'due_at' => ['nullable', 'date', 'required_if:quiz_mode,assign', 'after:now'],
             'randomize_options' => ['sometimes', 'boolean'],
             'bgm' => ['nullable', 'file', 'mimes:mp3', 'max:10240'],
@@ -151,6 +163,7 @@ class QuizController extends Controller
                 'duration_minutes' => $validated['duration_minutes'],
                 'max_attempts' => $validated['max_attempts'] ?? null,
                 'quiz_mode' => $validated['quiz_mode'] ?? 'live',
+                'game_mode' => ($validated['quiz_mode'] ?? 'live') === 'assign' ? 'assign' : ($validated['game_mode'] ?? 'live_individual'),
                 'due_at' => $validated['due_at'] ?? null,
                 'randomize_options' => (bool) ($validated['randomize_options'] ?? true),
                 'bgm_path' => $bgmPath,
@@ -186,8 +199,15 @@ class QuizController extends Controller
     /**
      * Download template Excel untuk pengisian soal kuis.
      */
-    public function downloadTemplate(): StreamedResponse
+    public function downloadTemplate(Request $request): StreamedResponse
     {
+        $gameMode = $request->input('game_mode', 'live_individual');
+        $gameModeLabel = [
+            'live_individual' => 'Live Host / Classic',
+            'assign' => 'Assign (PR / Tugas)',
+            'team_battle' => 'Team vs Team',
+            'steal_crown' => 'Steal the Crown',
+        ][$gameMode] ?? 'Live Host / Classic';
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Template Soal Kuis');
@@ -258,7 +278,8 @@ class QuizController extends Controller
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        $fileName = 'Template_Soal_Kuis_SMKPesat.xlsx';
+        $safeModeLabel = preg_replace('/[^A-Za-z0-9_-]+/', '_', $gameModeLabel);
+        $fileName = 'Template_Soal_Kuis_SMKPesat_'.$safeModeLabel.'.xlsx';
 
         return response()->streamDownload(function () use ($spreadsheet) {
             $writer = new Xlsx($spreadsheet);
@@ -280,6 +301,10 @@ class QuizController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
             'duration_minutes' => ['nullable', 'integer', 'min:1', 'max:180'],
+            'quiz_mode' => ['sometimes', 'in:live,assign'],
+            'game_mode' => ['sometimes', 'in:live_individual,assign,team_battle,steal_crown'],
+            'max_attempts' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:20'],
+            'due_at' => ['nullable', 'date', 'required_if:quiz_mode,assign', 'after:now'],
             'file' => ['required', 'file', 'mimes:xlsx,xls,csv,txt', 'max:10240'],
         ], [
             'class_id.required' => 'Pilih kelas tujuan kuis terlebih dahulu.',
@@ -383,12 +408,17 @@ class QuizController extends Controller
         $durationMinutes = ! empty($validated['duration_minutes'])
             ? (int) $validated['duration_minutes']
             : max(1, (int) ceil($totalDurationSeconds / 60));
+        $gameMode = $validated['game_mode'] ?? (($validated['quiz_mode'] ?? 'live') === 'assign' ? 'assign' : 'live_individual');
 
-        DB::transaction(function () use ($schoolClass, $validated, $user, $durationMinutes, $parsedQuestions) {
+        DB::transaction(function () use ($schoolClass, $validated, $user, $durationMinutes, $parsedQuestions, $gameMode) {
             $quiz = $schoolClass->quizzes()->create([
                 'title' => $validated['title'],
                 'description' => $validated['description'] ?? null,
                 'duration_minutes' => $durationMinutes,
+                'max_attempts' => $validated['max_attempts'] ?? null,
+                'quiz_mode' => $validated['quiz_mode'] ?? ($gameMode === 'assign' ? 'assign' : 'live'),
+                'game_mode' => $gameMode,
+                'due_at' => $validated['due_at'] ?? null,
                 'time_per_question' => 30,
                 'randomize_options' => true,
                 'enable_fifty_fifty' => true,
@@ -504,6 +534,7 @@ class QuizController extends Controller
             'duration_minutes' => ['required', 'integer', 'min:1', 'max:180'],
             'max_attempts' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:20'],
             'quiz_mode' => ['sometimes', 'in:live,assign'],
+            'game_mode' => ['sometimes', 'in:live_individual,assign,team_battle,steal_crown'],
             'due_at' => ['nullable', 'date', 'required_if:quiz_mode,assign', 'after:now'],
             'randomize_options' => ['sometimes', 'boolean'],
             'bgm' => ['nullable', 'file', 'mimes:mp3', 'max:10240'],
@@ -546,6 +577,7 @@ class QuizController extends Controller
                 'duration_minutes' => $validated['duration_minutes'],
                 'max_attempts' => $validated['max_attempts'] ?? null,
                 'quiz_mode' => $validated['quiz_mode'] ?? 'live',
+                'game_mode' => ($validated['quiz_mode'] ?? 'live') === 'assign' ? 'assign' : ($validated['game_mode'] ?? 'live_individual'),
                 'due_at' => $validated['due_at'] ?? null,
                 'randomize_options' => (bool) ($validated['randomize_options'] ?? true),
                 ...($bgmPath ? ['bgm_path' => $bgmPath] : []),
@@ -596,6 +628,8 @@ class QuizController extends Controller
 
         $quiz->load(['schoolClass:id,name,subject']);
         $gameState = $this->quizGameState($quiz->id);
+        $gameState = $this->ensureTeamState($quiz, $gameState);
+        $gameState = $this->ensureCrownState($quiz, $gameState);
 
         if ($isStudent && $quiz->quiz_mode === 'live' && $gameState['status'] === 'ended') {
             return redirect()->route('quizzes.results', $quiz->id);
@@ -608,6 +642,10 @@ class QuizController extends Controller
         if ($quiz->quiz_mode === 'assign') {
             $gameState['status'] = 'running';
         }
+        $myParticipant = $gameState['participants'][(string) $user->id] ?? null;
+        $myTeam = $myParticipant && $quiz->game_mode === 'team_battle'
+            ? collect($gameState['teams'] ?? [])->firstWhere('id', $myParticipant['team_id'] ?? null)
+            : null;
 
         // Load questions with options.
         // PENTING: Untuk mencegah kecurangan inspect element, sembunyikan kolom is_correct saat kuis dimainkan!
@@ -656,6 +694,14 @@ class QuizController extends Controller
             'gameState' => $gameState,
             'leaderboard' => $leaderboard,
             'classAccuracy' => $this->liveAccuracy($quiz->id),
+            'myTeam' => $myTeam,
+            'crown' => [
+                'holder_id' => $gameState['crown_holder_id'] ?? null,
+                'holder_name' => $gameState['crown_holder_name'] ?? null,
+                'score' => (int) ($gameState['crown_holder_score'] ?? 0),
+            ],
+            'myCrown' => ($gameState['crown_holder_id'] ?? null) == $user->id,
+            'teamScores' => $gameState['teams'] ?? [],
             'audioTracks' => QuizAudioTrack::query()->where('is_active', true)->orderBy('sort_order')->orderBy('title')->get(['id', 'title', 'path', 'is_active', 'sort_order']),
         ]);
     }
@@ -745,11 +791,15 @@ class QuizController extends Controller
 
         $quiz->load(['schoolClass:id,name,subject']);
         $gameState = $this->quizGameState($quiz->id);
+        $gameState = $this->ensureCrownState($quiz, $gameState);
         if ($gameState['status'] === 'ended') {
             $gameState = ['status' => 'waiting', 'participants' => [], 'started_at' => null];
             $this->saveQuizGameState($quiz->id, $gameState);
             Cache::forget("quiz:live:{$quiz->id}:leaderboard");
         }
+        $gameState = $this->ensureTeamState($quiz, $gameState);
+        $gameState = $this->ensureCrownState($quiz, $gameState);
+        $this->saveQuizGameState($quiz->id, $gameState);
 
         return Inertia::render('Quizzes/Host', [
             'quiz' => $quiz,
@@ -769,18 +819,66 @@ class QuizController extends Controller
         abort_unless($isAllowed, 403, 'Anda tidak terdaftar di kelas kuis ini.');
 
         $state = $this->quizGameState($quiz->id);
+        $state = $this->ensureTeamState($quiz, $state);
+        $state = $this->ensureCrownState($quiz, $state);
         if ($quiz->quiz_mode === 'assign') {
             $state['status'] = 'running';
         }
-        $state['participants'][(string) $user->id] = [
+        $participant = [
             'user_id' => $user->id,
             'name' => $user->name,
             'joined_at' => now()->toISOString(),
         ];
+        if ($quiz->game_mode === 'team_battle') {
+            $team = collect($state['teams'])->sortBy(fn (array $item) => count($item['member_ids'] ?? []))->first();
+            if ($team) {
+                $participant['team_id'] = $team['id'];
+                $participant['team_name'] = $team['name'];
+                $participant['team_color'] = $team['color'];
+                foreach ($state['teams'] as &$teamState) {
+                    if ($teamState['id'] === $team['id']) $teamState['member_ids'][] = $user->id;
+                }
+                unset($teamState);
+            }
+        }
+        $state['participants'][(string) $user->id] = $participant;
         $this->saveQuizGameState($quiz->id, $state);
         $this->broadcastGameState($quiz->id, $state, 'Siswa bergabung ke lobby.');
         try {
             event(new ParticipantJoined($quiz->id, $state['participants'][(string) $user->id], count($state['participants'])));
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+
+        return response()->json($state);
+    }
+
+    public function shuffleTeams(Request $request, Quiz $quiz): \Illuminate\Http\JsonResponse
+    {
+        $this->authorizeQuizHost($request, $quiz);
+        abort_unless($quiz->game_mode === 'team_battle', 422, 'Mode kuis ini bukan Team vs Team.');
+        $validated = $request->validate(['team_count' => ['required', 'integer', 'in:2,3,4']]);
+        $state = $this->ensureTeamState($quiz, $this->quizGameState($quiz->id), (int) $validated['team_count']);
+        foreach ($state['teams'] as &$team) {
+            $team['member_ids'] = [];
+            $team['score'] = 0;
+            $team['correct_answers'] = 0;
+            $team['answered_questions'] = 0;
+        }
+        unset($team);
+        $participants = collect($state['participants'])->shuffle()->values();
+        foreach ($participants as $index => $participant) {
+            $team = $state['teams'][$index % count($state['teams'])];
+            $participant['team_id'] = $team['id'];
+            $participant['team_name'] = $team['name'];
+            $participant['team_color'] = $team['color'];
+            $state['participants'][(string) $participant['user_id']] = $participant;
+            $state['teams'][$index % count($state['teams'])]['member_ids'][] = $participant['user_id'];
+        }
+        $this->saveQuizGameState($quiz->id, $state);
+        $this->broadcastGameState($quiz->id, $state, 'Pembagian tim diperbarui.');
+        try {
+            event(new QuizTeamScoresUpdated($quiz->id, $state['teams']));
         } catch (\Throwable $exception) {
             report($exception);
         }
@@ -806,6 +904,11 @@ class QuizController extends Controller
         $this->authorizeQuizHost($request, $quiz);
         abort_unless($quiz->quiz_mode === 'live', 422, 'Hanya kuis Live Game yang dapat dimulai oleh host.');
         $state = $this->quizGameState($quiz->id);
+        $state = $this->ensureTeamState($quiz, $state);
+        $state = $this->ensureCrownState($quiz, $state);
+        if ($quiz->game_mode === 'team_battle' && collect($state['participants'])->contains(fn (array $participant): bool => empty($participant['team_id']))) {
+            $state = $this->shuffleTeamState($state);
+        }
         $state['status'] = 'running';
         $state['started_at'] = now()->toISOString();
         $this->saveQuizGameState($quiz->id, $state);
@@ -854,6 +957,55 @@ class QuizController extends Controller
         ]);
     }
 
+    private function ensureTeamState(Quiz $quiz, array $state, ?int $teamCount = null): array
+    {
+        if ($quiz->game_mode !== 'team_battle') return $state;
+        $teamCount ??= (int) ($state['team_count'] ?? 2);
+        $teamCount = max(2, min(4, $teamCount));
+        if (($state['team_count'] ?? null) !== $teamCount || count($state['teams'] ?? []) !== $teamCount) {
+            $state['team_count'] = $teamCount;
+            $state['teams'] = array_map(fn (array $team) => [...$team, 'member_ids' => [], 'score' => 0, 'correct_answers' => 0, 'answered_questions' => 0], $this->teamDefinitions($teamCount));
+        }
+        return $state;
+    }
+
+    private function ensureCrownState(Quiz $quiz, array $state): array
+    {
+        if ($quiz->game_mode !== 'steal_crown') return $state;
+
+        $state['crown_holder_id'] ??= null;
+        $state['crown_holder_name'] ??= null;
+        $state['crown_holder_score'] ??= 0;
+
+        return $state;
+    }
+
+    private function teamDefinitions(int $count): array
+    {
+        $definitions = [
+            ['id' => 'red', 'name' => 'Tim Merah', 'color' => '#EF4444'],
+            ['id' => 'blue', 'name' => 'Tim Biru', 'color' => '#3B82F6'],
+            ['id' => 'gold', 'name' => 'Tim Emas', 'color' => '#F59E0B'],
+            ['id' => 'green', 'name' => 'Tim Hijau', 'color' => '#10B981'],
+        ];
+        return array_slice($definitions, 0, $count);
+    }
+
+    private function shuffleTeamState(array $state): array
+    {
+        foreach ($state['teams'] as &$team) $team['member_ids'] = [];
+        unset($team);
+        foreach (collect($state['participants'])->shuffle()->values() as $index => $participant) {
+            $team = $state['teams'][$index % count($state['teams'])];
+            $participant['team_id'] = $team['id'];
+            $participant['team_name'] = $team['name'];
+            $participant['team_color'] = $team['color'];
+            $state['participants'][(string) $participant['user_id']] = $participant;
+            $state['teams'][$index % count($state['teams'])]['member_ids'][] = $participant['user_id'];
+        }
+        return $state;
+    }
+
     private function saveQuizGameState(int $quizId, array $state): void
     {
         Cache::put("quiz:game:{$quizId}", $state, now()->addHours(12));
@@ -867,6 +1019,12 @@ class QuizController extends Controller
                 $state['status'],
                 array_values($state['participants'] ?? []),
                 $message,
+                array_values($state['teams'] ?? []),
+                [
+                    'holder_id' => $state['crown_holder_id'] ?? null,
+                    'holder_name' => $state['crown_holder_name'] ?? null,
+                    'score' => (int) ($state['crown_holder_score'] ?? 0),
+                ],
             ));
         } catch (\Throwable $exception) {
             report($exception);
@@ -886,6 +1044,22 @@ class QuizController extends Controller
     {
         try {
             event(new QuizEnded($quizId, $this->liveLeaderboardData($quizId)));
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+    }
+
+    private function broadcastCrownTransfer(int $quizId, ?int $holderId, ?string $holderName, ?int $previousHolderId, string $reason, int $score): void
+    {
+        try {
+            $avatar = null;
+            if ($holderId) {
+                $avatarPath = User::whereKey($holderId)->value('avatar');
+                if ($avatarPath) {
+                    $avatar = str_starts_with($avatarPath, 'http') ? $avatarPath : Storage::url($avatarPath);
+                }
+            }
+            event(new CrownTransferred($quizId, $holderId, $holderName, $previousHolderId, $reason, $score, $avatar));
         } catch (\Throwable $exception) {
             report($exception);
         }
@@ -940,6 +1114,12 @@ class QuizController extends Controller
         $state['powerups'] ??= ['fifty_fifty' => 0, 'freeze_time' => 0];
         $questionKey = (string) $question->id;
 
+        $liveGameState = $this->ensureCrownState($quiz, $this->quizGameState($quiz->id));
+        $previousCrownId = $liveGameState['crown_holder_id'] ?? null;
+        $wasCrownHolder = $quiz->game_mode === 'steal_crown'
+            && $previousCrownId !== null
+            && (int) $previousCrownId === (int) $user->id;
+
         // Idempotent: refresh atau klik ganda tidak boleh menggandakan poin.
         if (array_key_exists($questionKey, $state['answers'] ?? [])) {
             return response()->json([
@@ -948,6 +1128,10 @@ class QuizController extends Controller
                 'leaderboard' => $this->liveLeaderboardData($quiz->id),
                 'current_streak' => (int) ($state['current_streak'] ?? 0),
                 'powerup_stocks' => $state['powerups'],
+                'crown_holder_id' => $liveGameState['crown_holder_id'] ?? null,
+                'crown_holder_name' => $liveGameState['crown_holder_name'] ?? null,
+                'crown_holder_score' => (int) ($liveGameState['crown_holder_score'] ?? 0),
+                'crown_multiplier' => 1,
             ]);
         }
 
@@ -965,6 +1149,8 @@ class QuizController extends Controller
         $earned = $isCorrect
             ? (int) round($question->points * (1 + (0.5 * (1 - ($elapsed / $limit)))))
             : 0;
+        $crownMultiplier = $wasCrownHolder && $isCorrect ? 2 : 1;
+        $earned *= $crownMultiplier;
 
         $state['answers'][$questionKey] = [
             'option_ids' => $selectedIds,
@@ -986,6 +1172,27 @@ class QuizController extends Controller
         $state['score'] = (int) ($state['score'] ?? 0) + $earned;
         Cache::put($stateKey, $state, now()->addHours(2));
 
+        $teamScores = [];
+        if ($quiz->game_mode === 'team_battle') {
+            $gameState = $this->ensureTeamState($quiz, $this->quizGameState($quiz->id));
+            $participant = $gameState['participants'][(string) $user->id] ?? [];
+            $teamId = $participant['team_id'] ?? null;
+            foreach ($gameState['teams'] as &$team) {
+                if ($team['id'] !== $teamId) continue;
+                $team['score'] = (int) ($team['score'] ?? 0) + $earned;
+                $team['answered_questions'] = (int) ($team['answered_questions'] ?? 0) + 1;
+                $team['correct_answers'] = (int) ($team['correct_answers'] ?? 0) + (int) $isCorrect;
+            }
+            unset($team);
+            $this->saveQuizGameState($quiz->id, $gameState);
+            $teamScores = array_map(fn (array $team): array => [...$team, 'accuracy' => ($team['answered_questions'] ?? 0) > 0 ? round(($team['correct_answers'] / $team['answered_questions']) * 100, 1) : 0], $gameState['teams']);
+            try {
+                event(new QuizTeamScoresUpdated($quiz->id, $teamScores));
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
+        }
+
         $boardKey = "quiz:live:{$quiz->id}:leaderboard";
         $board = Cache::get($boardKey, []);
         $board[(string) $user->id] = [
@@ -996,10 +1203,84 @@ class QuizController extends Controller
         ];
         Cache::put($boardKey, $board, now()->addHours(2));
 
+        if ($quiz->game_mode === 'steal_crown') {
+            $candidates = array_values($board);
+            usort($candidates, function (array $left, array $right): int {
+                $scoreComparison = ((int) ($right['current_score'] ?? 0)) <=> ((int) ($left['current_score'] ?? 0));
+                return $scoreComparison !== 0
+                    ? $scoreComparison
+                    : ((int) ($left['updated_at'] ?? 0)) <=> ((int) ($right['updated_at'] ?? 0));
+            });
+
+            if (! $isCorrect && $wasCrownHolder) {
+                $candidates = array_values(array_filter(
+                    $candidates,
+                    fn (array $candidate): bool => (int) ($candidate['user_id'] ?? 0) !== (int) $user->id,
+                ));
+            }
+
+            $newCrown = collect($candidates)->first(fn (array $candidate): bool => (int) ($candidate['current_score'] ?? 0) > 0);
+            $newCrownId = $newCrown ? (int) $newCrown['user_id'] : null;
+            $newCrownName = $newCrown['name'] ?? null;
+            $newCrownScore = (int) ($newCrown['current_score'] ?? 0);
+            $oldCrownId = $previousCrownId !== null ? (int) $previousCrownId : null;
+
+            $liveGameState['crown_holder_id'] = $newCrownId;
+            $liveGameState['crown_holder_name'] = $newCrownName;
+            $liveGameState['crown_holder_score'] = $newCrownScore;
+            $this->saveQuizGameState($quiz->id, $liveGameState);
+
+            if ($oldCrownId !== $newCrownId) {
+                $reason = ! $isCorrect && $wasCrownHolder
+                    ? 'pemegang_salah'
+                    : ($oldCrownId !== null && $newCrownId !== null ? 'mahkota_direbut' : 'mahkota_diberikan');
+                $this->broadcastCrownTransfer($quiz->id, $newCrownId, $newCrownName, $oldCrownId, $reason, $newCrownScore);
+            }
+        }
+
+        $answeredKey = "quiz:live:{$quiz->id}:q:{$question->id}:answered";
+        $answeredUsers = Cache::get($answeredKey, []);
+        $answeredUsers[(string) $user->id] = true;
+        Cache::put($answeredKey, $answeredUsers, now()->addHours(2));
+        $answeredCount = count($answeredUsers);
+
+        $totalParticipants = max(count($liveGameState['participants'] ?? []), $answeredCount);
+
+        try {
+            event(new AnswerSubmitted(
+                quizId: $quiz->id,
+                questionId: $question->id,
+                userId: $user->id,
+                studentName: $user->name,
+                answeredCount: $answeredCount,
+                totalParticipants: $totalParticipants,
+                isCorrect: $isCorrect,
+                elapsedSeconds: $elapsed,
+            ));
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+
         $leaderboard = $this->liveLeaderboardData($quiz->id);
         $rank = $this->liveRank($quiz->id, $user->id);
+        $accuracy = $this->liveAccuracy($quiz->id);
+
         try {
-            event(new QuizScoreUpdated($quiz->id, $user->name, (int) $state['score'], $rank, $leaderboard, $this->liveAccuracy($quiz->id)));
+            event(new ScoreUpdated(
+                quizId: $quiz->id,
+                leaderboard: $leaderboard,
+                teams: $teamScores,
+                studentName: $user->name,
+                currentScore: (int) $state['score'],
+                rank: $rank,
+                classAccuracy: $accuracy,
+            ));
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+
+        try {
+            event(new QuizScoreUpdated($quiz->id, $user->name, (int) $state['score'], $rank, $leaderboard, $accuracy));
         } catch (\Throwable $exception) {
             // Skor tetap tersimpan dan fallback polling tetap berjalan jika Reverb sedang mati.
             report($exception);
@@ -1014,6 +1295,11 @@ class QuizController extends Controller
             'current_streak' => (int) $state['current_streak'],
             'powerup_reward' => $powerupReward,
             'powerup_stocks' => $state['powerups'],
+            'team_scores' => $teamScores,
+            'crown_holder_id' => $liveGameState['crown_holder_id'] ?? null,
+            'crown_holder_name' => $liveGameState['crown_holder_name'] ?? null,
+            'crown_holder_score' => (int) ($liveGameState['crown_holder_score'] ?? 0),
+            'crown_multiplier' => $crownMultiplier,
         ]);
     }
 

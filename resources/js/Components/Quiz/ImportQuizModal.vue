@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import InputError from '@/Components/InputError.vue';
 
@@ -16,9 +16,20 @@ const props = defineProps({
         type: [Number, String],
         default: null,
     },
+    gameMode: {
+        type: String,
+        default: 'live_individual',
+    },
 });
 
 const emit = defineEmits(['close', 'success']);
+
+const gameModeLabel = computed(() => ({
+    live_individual: 'Live Host / Classic',
+    assign: 'Assign (PR / Tugas)',
+    team_battle: 'Team vs Team',
+    steal_crown: 'Steal the Crown',
+}[props.gameMode] || props.gameMode));
 
 const fileInput = ref(null);
 
@@ -27,7 +38,16 @@ const form = useForm({
     title: '',
     description: '',
     duration_minutes: 15,
+    max_attempts: null,
+    due_at: '',
+    quiz_mode: props.gameMode === 'assign' ? 'assign' : 'live',
+    game_mode: props.gameMode,
     file: null,
+});
+
+watch(() => props.gameMode, (mode) => {
+    form.game_mode = mode;
+    form.quiz_mode = mode === 'assign' ? 'assign' : 'live';
 });
 
 watch(
@@ -115,11 +135,11 @@ const submitImport = () => {
                     <div>
                         <span class="text-xs font-bold text-slate-800">Format Template Spreadsheet</span>
                         <p class="text-[11px] text-slate-600 mt-0.5">
-                            Gunakan kolom Pertanyaan, Tipe Soal, Opsi A–D, Jawaban Benar, Durasi, dan Poin. Jawaban kompleks dapat ditulis A,C.
+                            Mode: <strong>{{ gameModeLabel }}</strong>. Gunakan kolom Pertanyaan, Tipe Soal, Opsi A–D, Jawaban Benar, Durasi, dan Poin.
                         </p>
                     </div>
                     <a
-                        :href="route('quizzes.template-excel')"
+                        :href="route('quizzes.template-excel', { game_mode: gameMode })"
                         download
                         class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-white px-3.5 py-2 text-xs font-bold text-[#0B2E8A] shadow-sm border border-blue-200 hover:bg-blue-50 transition"
                     >
@@ -192,6 +212,11 @@ const submitImport = () => {
                         />
                         <InputError :message="form.errors.description" class="mt-1" />
                     </div>
+                </div>
+
+                <div v-if="gameMode === 'assign'" class="grid gap-4 rounded-xl border border-[#FFA800]/30 bg-[#FFA800]/5 p-4 sm:grid-cols-2">
+                    <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Tenggat Waktu</label><input v-model="form.due_at" type="datetime-local" class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]" required /><InputError :message="form.errors.due_at" class="mt-1" /></div>
+                    <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Batas Pengulangan</label><input v-model="form.max_attempts" type="number" min="1" max="20" placeholder="Contoh: 3" class="mt-1.5 block w-full rounded-xl border-slate-300 text-sm focus:border-[#0E3BB0] focus:ring-[#0E3BB0]" /><p class="mt-1 text-[11px] text-slate-500">Kosongkan jika tanpa batas.</p></div>
                 </div>
 
                 <!-- File Excel Upload -->

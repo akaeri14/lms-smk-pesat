@@ -37,6 +37,10 @@ const props = defineProps({
         default: () => ({ status: 'waiting', participants: [] }),
     },
     audioTracks: { type: Array, default: () => [] },
+    myTeam: { type: Object, default: null },
+    teamScores: { type: Array, default: () => [] },
+    crown: { type: Object, default: () => ({ holder_id: null, holder_name: null, score: 0 }) },
+    myCrown: { type: Boolean, default: false },
 });
 
 const page = usePage();
@@ -109,6 +113,10 @@ const hiddenOptionIds = ref([]);
 const freezeRemaining = ref(0);
 const liveLeaderboard = ref([...props.liveLeaderboard]);
 const remoteGameStatus = ref(props.gameState?.status || 'waiting');
+const myTeam = ref(props.myTeam);
+const crownHolder = ref(props.crown?.holder_id ? { ...props.crown } : null);
+const hasCrown = ref(props.myCrown);
+const crownNotice = ref('');
 const quizStartedAt = ref(null);
 const questionStartedAt = ref(null);
 let timerInterval = null;
@@ -258,6 +266,11 @@ const redirectToResults = () => {
 const applyGameState = (payload) => {
     if (!payload?.status) return;
     remoteGameStatus.value = payload.status;
+    if (Array.isArray(payload.participants)) {
+        const participant = payload.participants.find((item) => String(item.user_id) === String(user.value.id));
+        if (participant?.team_id) myTeam.value = { id: participant.team_id, name: participant.team_name, color: participant.team_color };
+    }
+    if (payload.crown) applyCrown(payload.crown, false);
 
     if (payload.status === 'running' && gameState.value === 'ready' && props.canAttempt) {
         startQuiz();
@@ -270,6 +283,26 @@ const applyGameState = (payload) => {
 
     if (payload.status === 'ended' && gameState.value !== 'result') {
         redirectToResults();
+    }
+};
+
+const applyCrown = (payload, notify = true) => {
+    const previousId = crownHolder.value?.holder_id || crownHolder.value?.id;
+    const nextId = payload?.holder_id || null;
+    crownHolder.value = nextId
+        ? { holder_id: nextId, holder_name: payload.holder_name || 'Peserta', score: payload.score || 0 }
+        : null;
+    hasCrown.value = nextId !== null && String(nextId) === String(user.value.id);
+
+    if (notify && String(previousId || '') !== String(nextId || '')) {
+        crownNotice.value = hasCrown.value
+            ? 'Mahkota berhasil direbut! Jawaban benar bernilai 2x poin.'
+            : previousId && String(previousId) === String(user.value.id)
+                ? 'Mahkota kamu direbut peserta lain.'
+                : nextId
+                    ? `${payload.holder_name || 'Peserta'} menjadi pemegang mahkota baru.`
+                    : 'Mahkota sedang diperebutkan kembali.';
+        window.setTimeout(() => { crownNotice.value = ''; }, 3500);
     }
 };
 
@@ -310,7 +343,9 @@ const startLiveLeaderboard = () => {
         liveChannel = window.Echo.private(`quiz.${props.quiz.id}`)
             .listen('.quiz.game.state.updated', applyGameState)
             .listen('.quiz.started', applyQuizStarted)
-            .listen('.quiz.ended', applyQuizEnded);
+            .listen('.quiz.ended', applyQuizEnded)
+            .listen('.quiz.crown.transferred', (payload) => applyCrown(payload))
+            .listen('CrownTransferred', (payload) => applyCrown(payload));
     }
 
     liveLeaderboardInterval = setInterval(() => {
@@ -324,6 +359,8 @@ const startLiveLeaderboard = () => {
 const applyAnswerResult = (data) => {
     if (typeof data?.current_streak === 'number') streak.value = data.current_streak;
     if (data?.powerup_stocks) powerupStocks.value = data.powerup_stocks;
+    if (data?.crown_holder_id !== undefined) applyCrown({ holder_id: data.crown_holder_id, holder_name: data.crown_holder_name, score: data.crown_holder_score }, false);
+    if (data?.is_correct) earnedPoints.value += (100 + streak.value * 10) * (data?.crown_multiplier || 1);
     if (data?.powerup_reward) {
         powerupReward.value = data.powerup_reward;
         rewardNotice.value = `${streak.value}x Streak! Kamu mendapatkan Power-Up ${data.powerup_reward === 'fifty_fifty' ? '50:50' : 'Freeze Time'}!`;
@@ -369,9 +406,6 @@ const chooseOption = (optionId) => {
     selectedAnswers.value[q.id] = optionId;
     submitAnswerToServer(q, optionId);
 
-    // Tambah skor game visual
-    earnedPoints.value += 100 + streak.value * 10;
-
     setTimeout(() => {
         if (currentQuestionIndex.value < props.questions.length - 1) {
             advanceQuestion();
@@ -396,7 +430,6 @@ const submitComplexAnswer = () => {
     recordAnswerTime();
     selectedAnswers.value[q.id] = [...selectedOptionIds.value];
     submitAnswerToServer(q, selectedOptionIds.value);
-    earnedPoints.value += 100 + streak.value * 10;
     setTimeout(() => currentQuestionIndex.value < props.questions.length - 1 ? advanceQuestion() : finishQuiz(), 450);
 };
 
@@ -501,6 +534,8 @@ onUnmounted(() => {
                         {{ quiz.title }}
                     </h1>
                     <p class="text-[11px] text-slate-400">{{ quiz.school_class?.name }} · {{ quiz.school_class?.subject }}</p>
+                    <span v-if="quiz.game_mode === 'team_battle' && myTeam" class="mt-1 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-black text-white" :style="{ backgroundColor: myTeam.color }">Kamu di {{ myTeam.name }}</span>
+                    <span v-if="quiz.game_mode === 'steal_crown' && hasCrown" class="mt-1 inline-flex items-center gap-1.5 rounded-full bg-[#FFA800] px-2 py-0.5 text-[10px] font-black text-slate-950"><svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m3 7 3 3 3-6 3 6 3-6 3 6 3-3-2 12H5L3 7Z"/></svg> Raja/Ratu Kuis Saat Ini · 2x Poin</span>
                 </div>
             </div>
 
@@ -612,6 +647,7 @@ onUnmounted(() => {
                 </div>
             </div>
             <Transition name="reward"><div v-if="rewardNotice" class="rounded-xl border border-emerald-400/40 bg-emerald-500/15 px-4 py-3 text-center text-sm font-black text-emerald-200">{{ rewardNotice }}</div></Transition>
+            <Transition name="reward"><div v-if="crownNotice" class="rounded-xl border border-[#FFA800]/50 bg-[#FFA800]/15 px-4 py-3 text-center text-sm font-black text-[#FFA800]">{{ crownNotice }}</div></Transition>
 
             <!-- Question Card -->
             <div class="flex-1 flex items-center justify-center my-4">

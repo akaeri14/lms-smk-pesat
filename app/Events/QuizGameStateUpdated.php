@@ -16,6 +16,8 @@ class QuizGameStateUpdated implements ShouldBroadcastNow
         public string $status,
         public array $participants = [],
         public ?string $message = null,
+        public array $teams = [],
+        public array $crown = [],
     ) {}
 
     public function broadcastOn(): array
@@ -36,6 +38,8 @@ class QuizGameStateUpdated implements ShouldBroadcastNow
             'participants' => $this->participants,
             'participant_count' => count($this->participants),
             'message' => $this->message,
+            'teams' => $this->teams,
+            'crown' => $this->crown,
         ];
     }
 }

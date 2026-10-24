@@ -13,7 +13,7 @@ const navigation = [
     { label: 'Kelas Saya', route: 'classes.index', icon: 'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z M4 19h16v3H6.5A2.5 2.5 0 0 1 4 19Z' },
     { label: 'Tugas', route: 'assignments.index', icon: 'M9 5h6m-3-2v4m-6 1h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a1 1 0 0 1-2-2V10a2 2 0 0 1 2-2Z' },
     { label: 'Game Kuis', route: 'quizzes.index', icon: 'M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { label: 'Kehadiran', icon: 'M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z' },
+    //{ label: 'Kehadiran', icon: 'M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z' },
 ];
 
 const adminNavigation = [

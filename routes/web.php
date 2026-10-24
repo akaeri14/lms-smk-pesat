@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::post('quizzes/{quiz}/join', [QuizController::class, 'joinGame'])->name('quizzes.join');
     Route::get('quizzes/{quiz}/game-state', [QuizController::class, 'gameState'])->name('quizzes.game-state');
     Route::post('quizzes/{quiz}/start', [QuizController::class, 'startGame'])->name('quizzes.start');
+    Route::post('quizzes/{quiz}/shuffle-teams', [QuizController::class, 'shuffleTeams'])->name('quizzes.shuffle-teams');
     Route::post('quizzes/{quiz}/pause', [QuizController::class, 'pauseGame'])->name('quizzes.pause');
     Route::post('quizzes/{quiz}/end', [QuizController::class, 'endGame'])->name('quizzes.end');
     Route::post('quizzes/{quiz}/answers', [QuizController::class, 'submitAnswer'])->name('quizzes.answers.store');

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
-#[Fillable(['class_id', 'title', 'description', 'duration_minutes', 'max_attempts', 'quiz_mode', 'due_at', 'randomize_options', 'bgm_path', 'time_per_question', 'enable_fifty_fifty', 'enable_freeze_time', 'is_published', 'status', 'created_by'])]
+#[Fillable(['class_id', 'title', 'description', 'duration_minutes', 'max_attempts', 'quiz_mode', 'game_mode', 'due_at', 'randomize_options', 'bgm_path', 'time_per_question', 'enable_fifty_fifty', 'enable_freeze_time', 'is_published', 'status', 'created_by'])]
 class Quiz extends Model
 {
     use HasFactory;
