@@ -815,7 +815,8 @@ onUnmounted(() => {
         </main>
 
         <!-- Footer simple info -->
-        <footer class="relative z-10 text-center py-4 border-t border-white/5 text-[11px] text-slate-600">
+        <footer class="relative z-10 flex items-center justify-center gap-2 border-t border-white/5 py-4 text-[11px] text-slate-600">
+            <img src="/images/logo-xpro.png" alt="XPRO" class="h-5 w-auto object-contain" />
             LMS SMK Pesat · Interactive Gamified Quiz Engine
         </footer>
     </div>

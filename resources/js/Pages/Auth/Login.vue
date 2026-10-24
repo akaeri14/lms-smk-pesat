@@ -31,7 +31,10 @@ const submit = () => {
             <div class="absolute -bottom-44 -left-28 h-[30rem] w-[30rem] rounded-full border-[52px] border-white/10" />
 
             <Link href="/" class="relative z-10 flex w-fit items-center gap-3">
-                <span class="grid h-12 w-12 place-items-center rounded-2xl bg-white text-xl font-black text-[#0E3BB0] shadow-lg">P</span>
+                <span class="grid h-14 w-20 shrink-0 place-items-center overflow-hidden rounded-2xl bg-white/15 px-1 shadow-lg backdrop-blur">
+                    <img src="/images/logo-xpro.png" alt="XPRO" class="max-h-10 max-w-full object-contain" @error="$event.currentTarget.classList.add('hidden'); $event.currentTarget.nextElementSibling.classList.remove('hidden')" />
+                    <span class="hidden text-base font-black tracking-tight text-white">XPRO</span>
+                </span>
                 <span><span class="block text-base font-black tracking-tight">SMK Pesat</span><span class="block text-[10px] font-bold uppercase tracking-[0.18em] text-blue-100">Learning Space</span></span>
             </Link>
 
@@ -52,7 +55,10 @@ const submit = () => {
         <section class="flex min-h-screen items-center justify-center px-5 py-10 sm:px-10 lg:px-14 xl:px-24">
             <div class="w-full max-w-md">
                 <div class="mb-10 flex items-center gap-3 lg:hidden">
-                    <span class="grid h-11 w-11 place-items-center rounded-xl bg-[#0E3BB0] text-lg font-black text-white shadow-md shadow-blue-200">P</span>
+                    <span class="grid h-12 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#0E3BB0] px-1 shadow-md shadow-blue-200">
+                        <img src="/images/logo-xpro.png" alt="XPRO" class="max-h-9 max-w-full object-contain" @error="$event.currentTarget.classList.add('hidden'); $event.currentTarget.nextElementSibling.classList.remove('hidden')" />
+                        <span class="hidden text-sm font-black tracking-tight text-white">XPRO</span>
+                    </span>
                     <span><span class="block text-sm font-black tracking-tight text-slate-900">SMK Pesat</span><span class="block text-[10px] font-bold uppercase tracking-[0.16em] text-[#0E3BB0]">Learning Space</span></span>
                 </div>
 

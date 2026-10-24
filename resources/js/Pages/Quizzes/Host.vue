@@ -210,10 +210,16 @@ onUnmounted(() => {
 
     <div class="min-h-screen bg-slate-950 text-white">
         <header class="flex items-center justify-between border-b border-white/10 bg-slate-900/80 px-6 py-4">
-            <div>
-                <p class="text-xs font-bold uppercase tracking-widest text-[#FFA800]">SMK Pesat · Host Mode</p>
-                <h1 class="mt-1 text-xl font-black">{{ quiz.title }}</h1>
-                <p class="text-xs text-slate-400">{{ quiz.school_class?.name }} · {{ statusLabel }}</p>
+            <div class="flex items-center gap-3">
+                <span class="grid h-10 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#0E3BB0] px-1">
+                    <img src="/images/logo-xpro.png" alt="XPRO" class="max-h-8 max-w-full object-contain" @error="$event.currentTarget.classList.add('hidden'); $event.currentTarget.nextElementSibling.classList.remove('hidden')" />
+                    <span class="hidden text-xs font-black text-white">XPRO</span>
+                </span>
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-[#FFA800]">SMK Pesat · Host Mode</p>
+                    <h1 class="mt-1 text-xl font-black">{{ quiz.title }}</h1>
+                    <p class="text-xs text-slate-400">{{ quiz.school_class?.name }} · {{ statusLabel }}</p>
+                </div>
             </div>
             <div class="flex items-center gap-2"><QuizAudioPlayer ref="bgmPlayer" :tracks="audioTracks" label="musik" /><Link :href="route('quizzes.show', quiz.id)" class="rounded-xl border border-white/15 px-4 py-2 text-xs font-bold text-slate-300 hover:bg-white/10">Keluar</Link></div>
         </header>
